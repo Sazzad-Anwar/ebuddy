@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+a {
+    color: inherit;
+    text-decoration: none !important;
+}
+
+[contenteditable].form-control:focus,
+[type='email'].form-control:focus,
+[type='password'].form-control:focus,
+[type='tel'].form-control:focus,
+[type='text'].form-control:focus,
+[type='checkbox'].form-control:focus,
+input.form-control:focus,
+input[type='email']:focus,
+input[type='number']:focus,
+input[type='password']:focus,
+input[type='text']:focus,
+textarea.form-control:focus,
+textarea:focus,
+.form-select:focus,
+button:active,
+button:focus,
+custom-control-input:checked,
+custom-control-input:not(checked),
+.btn:focus {
+    box-shadow: inset 0 -1px 0 #ddd !important;
+}
+
+.message__body {
+    height: calc(100vh - 300px);
+}
+
+.active:hover {
+    color: #1c2834 !important;
+}
+
+.photo > .delete__icon {
+    display: none;
+    position: absolute !important;
+    top: 0;
+    right: 32%;
+    transition: all 0.4s ease-in-out;
+}
+
+.photo:hover > .delete__icon {
+    display: block;
+    transition: all 0.4s ease-in-out;
+}
+
+.text__active {
+    color: green !important;
+    font-weight: bolder;
+}
+
+.text__not__active {
+    color: red !important;
+    font-weight: bolder;
+}
