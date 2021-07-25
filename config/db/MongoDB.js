@@ -12,7 +12,7 @@ const connectDB = async (databaseName) => {
             console.log(`MongoDB Connected: ${conn.connection.host}`.green.underline);
 
         } else {
-            const conn = await mongoose.connect(process.env.MONGODBURI, {
+            const conn = await mongoose.connect(process.env.MONGO_URI, {
                 useUnifiedTopology: true,
                 useNewUrlParser: true,
                 useCreateIndex: true,
