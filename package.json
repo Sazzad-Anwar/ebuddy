@@ -1,6 +1,6 @@
 {
     "name": "e-chat-buddy",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Online Chatting, Voice calling & Video calling Application",
     "main": "app.js",
     "scripts": {
@@ -43,6 +43,6 @@
         "nodemon": "^2.0.12"
     },
     "engines": {
-        "node": "14.16.1"
+        "node": "^"
     }
 }
