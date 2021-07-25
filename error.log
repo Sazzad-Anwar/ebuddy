@@ -1,0 +1,10 @@
+{
+  level: 'error',
+  message: "Cannot access 'user' before initialization",
+  IP: '::ffff:127.0.0.1',
+  stack: "ReferenceError: Cannot access 'user' before initialization\n" +
+    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\controllers\\AppController.js:45:37\n' +
+    '    at processTicksAndRejections (internal/process/task_queues.js:93:5)',
+  error_occured: 'Sun, Jul 25, 2021, 12:10 PM',
+  timestamp: '2021-07-25T06:10:06.903Z'
+}

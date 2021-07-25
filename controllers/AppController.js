@@ -42,7 +42,7 @@ const saveUser = asyncHandler(async (req, res) => {
             await User.updateOne({ email }, {
                 $set: {
                     name,
-                    photo
+                    photo: photo ?? userExist.photo
                 }
             })
             let user = await User.findOne({ email });

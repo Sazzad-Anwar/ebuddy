@@ -1,13 +1,13 @@
 const User = require('../models/users')
 
 const joinUsers = async (id, email, photo) => {
-
+    let user = await User.findOne({ email });
     await User.updateOne(
         { email },
         {
             $set: {
                 socketId: id,
-                photo: photo ?? '',
+                photo: photo ?? user.photo,
                 isActive: true
             }
         }

@@ -47,12 +47,20 @@ const Chat = () => {
                 (userInfo) => userInfo.email !== user.email
             );
             console.log(userData.joinedUser);
-            if (userData.joinedUser && userData.joinedUser.email !== user.email) {
+            if (
+                userData.joinedUser &&
+                userData.joinedUser.email !== user.email &&
+                user.isLoggedIn
+            ) {
                 addToast(`${userData.joinedUser.name} is active`, {
                     appearance: 'info',
                     autoDismiss: true,
                 });
-            } else if (userData.leavingUser && userData.leavingUser.email !== user.email) {
+            } else if (
+                userData.leavingUser &&
+                userData.leavingUser.email !== user.email &&
+                user.isLoggedIn
+            ) {
                 addToast(`${userData.leavingUser.name} has left`, {
                     appearance: 'info',
                     autoDismiss: true,
@@ -116,7 +124,15 @@ const Chat = () => {
             <Navbar bg="dark" expand="lg">
                 <Container>
                     <Link to="/">
-                        <Navbar.Brand className="text-white">Chat Application</Navbar.Brand>
+                        <Navbar.Brand className="text-white">
+                            <img
+                                className="app__logo me-2"
+                                height="30px"
+                                src="/logo.gif"
+                                alt="logo"
+                            />
+                            <span className="h4">Chat-Buddy</span>
+                        </Navbar.Brand>
                     </Link>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
@@ -189,7 +205,11 @@ const Chat = () => {
                                         }
                                         color="primary"
                                     >
-                                        <Avatar alt={userInfo.name} src={userInfo.photo} />
+                                        <Avatar
+                                            alt={userInfo.name}
+                                            src={userInfo.photo}
+                                            className="shadow-lg border"
+                                        />
                                     </Badge>
 
                                     <div className="ps-3 ">
@@ -197,7 +217,7 @@ const Chat = () => {
                                         <p className="text-white my-0">
                                             {userInfo.isActive
                                                 ? 'Active Now'
-                                                : `Left ${moment().fromNow(userInfo.updatedAt)}`}
+                                                : `Active ${moment(userInfo.updatedAt).fromNow()}`}
                                             {}
                                         </p>
                                     </div>
@@ -229,9 +249,9 @@ const Chat = () => {
                                             <p className="text-white my-0">
                                                 {roomUser.isActive
                                                     ? 'Active now'
-                                                    : `Left ${moment().fromNow(
+                                                    : `Active ${moment(
                                                           roomUser.updatedAt
-                                                      )}`}
+                                                      ).fromNow()}`}
                                             </p>
                                         </div>
                                     </section>
@@ -301,9 +321,9 @@ const Chat = () => {
                                                                 />
                                                             </div>
                                                             <p className="text-white me-5">
-                                                                {moment().fromNow(
+                                                                {moment(
                                                                     messageDetails.sendAt
-                                                                )}
+                                                                ).fromNow()}
                                                             </p>
                                                         </div>
                                                     );

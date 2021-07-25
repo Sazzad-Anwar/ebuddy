@@ -64,9 +64,12 @@ const HomeScreen = () => {
     }, [history, userData]);
 
     return (
-        <div className="bg-primary" style={{ height: '100vh' }}>
+        <div className="bg-primary login__screen">
             <Container className="pt-5">
-                <h3 className="text-white pt-5 text-center">Login To Chat</h3>
+                <h3 className="text-white pt-5 text-center">
+                    Welcome to e-chat-Buddy
+                    <img className="app__logo ms-2" src="/logo.gif" alt="logo" />
+                </h3>
                 <Row>
                     <Col lg={4} />
                     <Col xs={12} md={12} lg={4}>

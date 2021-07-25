@@ -64,3 +64,13 @@ custom-control-input:not(checked),
     color: red !important;
     font-weight: bolder;
 }
+
+.login__screen {
+    min-height: 100vh;
+    height: 100%;
+}
+
+.app__logo {
+    height: 50px;
+    border-radius: 50%;
+}
