@@ -83,22 +83,55 @@ const saveUser = asyncHandler(async (req, res) => {
 
 const message = asyncHandler(async (req, res) => {
     if (req.method === 'GET') {
+        let { messageType } = req.query;
+
+        if (messageType === 'seen') {
+            let message = await Message.find({ isSeen: true, });
+
+            res.json({ message })
+        }
+        if (messageType === 'unseen') {
+            let message = await Message.find({ isSeen: true });
+
+            res.json({ message })
+        }
 
         let messages = await Message.find();
         res.json({ messages });
     }
     if (req.method === 'POST') {
-        let { user, from, file, to, message } = req.body;
+        let { user, from, file, to, message, repliedOf, _id } = req.body;
         let newMessage = new Message({
             user,
             from,
             file,
+            repliedOf,
             to,
             message
         })
 
-        await newMessage.save();
-        res.json({ message: newMessage });
+        if (_id) {
+            await Message.findByIdAndUpdate({ _id }, {
+                $set: {
+                    message
+                }
+            })
+
+            let editedMsg = await Message.findById({ _id });
+            res.json({ message: editedMsg });
+        } else {
+
+            await newMessage.save();
+            res.json({ message: newMessage });
+        }
+
+    }
+
+    if (req.method === 'PUT') {
+        let { userId } = req.query;
+
+        // let msgSeen = await 
+
     }
 
 });

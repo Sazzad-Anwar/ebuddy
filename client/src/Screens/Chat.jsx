@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-plusplus */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable no-underscore-dangle */
@@ -19,7 +20,7 @@ import {
 } from 'react-bootstrap';
 import SearchIcon from '@material-ui/icons/Search';
 import { Link, NavLink, useHistory, useLocation } from 'react-router-dom';
-import { Avatar, Card, Badge, IconButton, CardMedia } from '@material-ui/core';
+import { Avatar, Card, Badge, IconButton, CardMedia, Input } from '@material-ui/core';
 import moment from 'moment';
 import { io } from 'socket.io-client';
 import ScrollToBottom from 'react-scroll-to-bottom';
@@ -52,6 +53,7 @@ const Chat = () => {
     const [show, setShow] = useState(false);
     const [roomUserPicShow, setRoomUserPicShow] = useState(false);
     const [replyMsgDetails, setReplyMsgDetails] = useState({});
+    const [editMsgId, setEditMsgId] = useState('');
     const heightRef = useRef(0);
     const footerRef = useRef(0);
     const audio = new Audio('/msg_sound.mp3');
@@ -65,6 +67,7 @@ const Chat = () => {
             const othersData = userData.allUsers.filter(
                 (userInfo) => userInfo.email !== user.email
             );
+            setUsers(othersData);
             if (
                 userData.joinedUser &&
                 userData.joinedUser.email !== user.email &&
@@ -74,6 +77,10 @@ const Chat = () => {
                     appearance: 'info',
                     autoDismiss: true,
                 });
+
+                if (roomUser !== null && roomUser.email === userData.joinedUser.email) {
+                    setRoomUser(userData.joinedUser);
+                }
             } else if (
                 userData.leavingUser &&
                 userData.leavingUser.email !== user.email &&
@@ -81,10 +88,6 @@ const Chat = () => {
             ) {
                 setRoomUser(userData.leavingUser);
             }
-            setUsers(othersData);
-        });
-        socket.current.on('room-user-details', (userData) => {
-            setRoomUser(userData);
         });
 
         socket.current.on('chat-message', (chat) => {
@@ -99,7 +102,6 @@ const Chat = () => {
             } catch (error) {
                 console.log(error);
             }
-            console.log(messages);
         });
 
         socket.current.emit('user-login', user);
@@ -123,7 +125,6 @@ const Chat = () => {
             socket.current.off('room-user-details', (userData) => {});
             socket.current.off('chat-message', (chat) => {});
             socket.current.off('removeMsgFromChat', (data) => {});
-            // socket.current.off('roomUser', (userData) => {});
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addToast, user, search]);
@@ -135,14 +136,16 @@ const Chat = () => {
     const sendMessage = async (e) => {
         e.preventDefault();
         const chat = {
+            _id: editMsgId,
             user: user._id,
             from: user.email,
             file: images,
+            repliedOf: replyMsgDetails.message ?? '',
             to: roomUser.email,
             message,
             sendAt: Date.now(),
         };
-        if ((message && images) || images) {
+        if ((message && images) || images || e.key === 'Enter') {
             setMessage('');
             try {
                 const { data } = await axios.post('/api/v1/messages', chat);
@@ -150,6 +153,8 @@ const Chat = () => {
                 socket.current.emit('message', data.message);
                 setShow(false);
                 setImages([]);
+                setReplyMsgDetails({});
+                setEditMsgId('');
             } catch (error) {
                 console.log(error);
             }
@@ -171,6 +176,7 @@ const Chat = () => {
         try {
             const { data } = await axios.post('/api/v1/upload', formData);
             data.map((image) => setImages((preImage) => [...preImage, image.filePath]));
+            data.length ? setShow(true) : setShow(false);
         } catch (error) {
             console.log(error.response);
         }
@@ -180,6 +186,7 @@ const Chat = () => {
         const uploadId = id.split('/uploads/')[1];
         await axios.delete(`/api/v1/upload/${uploadId}`);
         setImages(images.filter((singleImage) => singleImage !== id));
+        images.length === 1 ? setShow(false) : setShow(true);
     };
 
     const onCloseRemoveImages = () => {
@@ -200,16 +207,20 @@ const Chat = () => {
     const deleteMsg = (id) => {
         socket.current.emit('messageDelete', id);
     };
-    const editMsg = (id) => {};
+    const editMsg = (id) => {
+        setEditMsgId(id);
+        setMessages(messages.filter((findMsg) => findMsg._id !== id));
+        setMessage(messages.filter((findMsg) => findMsg._id === id)[0].message);
+    };
 
     const replyMsg = (id) => {
-        setReplyMsgDetails(messages.find((findMsg) => findMsg._id === id));
+        setReplyMsgDetails(messages.filter((findMsg) => findMsg._id === id)[0]);
     };
 
     return (
         <div>
             <Navbar bg="dark" className="nav__bar" ref={heightRef} expand="lg">
-                <Container fluid={('xs', 'sm', 'md')}>
+                <Container fluid={('xs', 'sm', 'md', 'lg')}>
                     <Link to="/">
                         <Navbar.Brand className="text-white align-items-center">
                             <img
@@ -236,6 +247,7 @@ const Chat = () => {
                                         dispatch(userLogout());
                                         socket.current.disconnect();
                                         history.push('/');
+                                        localStorage.removeItem('roomUser');
                                     }}
                                 >
                                     <ExitToAppIcon className="text-white" />
@@ -287,7 +299,7 @@ const Chat = () => {
                         </Col>
                         <Col md={9} className="bg-primary">
                             <main className="position-relative h-100">
-                                {roomUser.name ? (
+                                {roomUser.email ? (
                                     <>
                                         <section
                                             className="message__header d-flex align-items-center py-4 px-2 border-bottom"
@@ -329,36 +341,68 @@ const Chat = () => {
                                             className="input__area position-absolute bottom-0 start-0 end-0"
                                             id="text__area"
                                         >
-                                            <form
-                                                onSubmit={sendMessage}
-                                                className="d-flex justify-content-center align-items-center mb-2"
-                                            >
-                                                <Form.Group
-                                                    className="w-100"
-                                                    controlId="exampleForm.ControlTextarea1"
-                                                >
-                                                    <Form.Control
-                                                        value={message}
-                                                        onChange={(e) => setMessage(e.target.value)}
-                                                        as="textarea"
-                                                        row={1}
-                                                    />
-                                                </Form.Group>
-
-                                                <Button
-                                                    variant="outline-secondary rounded-circle p-2 pl-3"
-                                                    className="ms-2"
-                                                    onClick={() => setShow(!show)}
-                                                >
-                                                    <AttachmentIcon className="fs-7" />
-                                                </Button>
-                                                <Button
-                                                    variant="outline-secondary rounded-circle p-2 pl-3 shadow-lg"
-                                                    className="ms-2"
-                                                    type="submit"
-                                                >
-                                                    <SendIcon className="fs-7" />
-                                                </Button>
+                                            <form onSubmit={sendMessage} className="mb-2">
+                                                <Row>
+                                                    {replyMsgDetails !== null &&
+                                                        replyMsgDetails.message && (
+                                                            <Col xs={10}>
+                                                                <div className="px-3 py-2">
+                                                                    <p className="mb-0 col-10 text-truncate text-white">
+                                                                        <b>Replying to:</b>
+                                                                        {replyMsgDetails.message}
+                                                                    </p>
+                                                                </div>
+                                                            </Col>
+                                                        )}
+                                                    <Col xs={10}>
+                                                        <Form.Group controlId="formBasicEmail">
+                                                            <Form.Control
+                                                                value={message}
+                                                                onChange={(e) =>
+                                                                    setMessage(e.target.value)
+                                                                }
+                                                                onKeyPress={(e) =>
+                                                                    e.key === 'Enter'
+                                                                        ? sendMessage(e)
+                                                                        : setMessage(e.target.value)
+                                                                }
+                                                                type="text"
+                                                                as="textarea"
+                                                                className="rounded text__input bg-primary text-white"
+                                                                autoComplete="off"
+                                                            />
+                                                        </Form.Group>
+                                                    </Col>
+                                                    <Col xs={1}>
+                                                        <label
+                                                            htmlFor="icon-button-file"
+                                                            className="float-end"
+                                                        >
+                                                            <Input
+                                                                id="icon-button-file"
+                                                                type="file"
+                                                                onChange={uploadFile}
+                                                                hidden
+                                                            />
+                                                            <IconButton
+                                                                aria-label="upload picture"
+                                                                component="span"
+                                                                className="border p-2 input__file__button"
+                                                            >
+                                                                <AttachmentIcon className="attachments__icon text-dark" />
+                                                            </IconButton>
+                                                        </label>
+                                                    </Col>
+                                                    <Col xs={1}>
+                                                        <Button
+                                                            variant="outline-secondary rounded-circle p-2 pl-3 shadow-lg float-start"
+                                                            className="ms-2"
+                                                            type="submit"
+                                                        >
+                                                            <SendIcon className="attachments__icon" />
+                                                        </Button>
+                                                    </Col>
+                                                </Row>
                                             </form>
                                         </section>
                                     </>
@@ -420,19 +464,6 @@ const Chat = () => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Group className="mb-3" controlId="photo">
-                        <Form.Label className="text-black">Upload Your file</Form.Label>
-                        <div className="input-group mb-3">
-                            <input
-                                type="file"
-                                className="form-control"
-                                onChange={uploadFile}
-                                placeholder="Input Photos"
-                                id="inputGroupFile02"
-                                multiple
-                            />
-                        </div>
-                    </Form.Group>
                     <Row
                         style={{
                             maxHeight: 450,
