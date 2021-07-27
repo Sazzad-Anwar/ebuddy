@@ -29,4 +29,3 @@ jobs:
             - run: npm install -g yarn
             - run: yarn install-all
             - run: yarn build-client
-            - run: yarn client-test
