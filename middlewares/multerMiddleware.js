@@ -4,13 +4,14 @@ const { v4: uuidv4 } = require('uuid');
 
 //@Description: Multer storage and file checking configurations
 const checkFileType = (file, cb) => {
-    const filetypes = /jpg|jpeg|png|JPG|JPEG|PNG/
+    const filetypes = /jpg|jpeg|png|JPG|JPEG|PNG|doc|DOC|DOCS|CSV|csv|docs|pdf|xls|xlsx|mp4|mp3|HTML|CSS|/
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
 
-    if (extname && mimetype) {
+    if (extname) {
         return cb(null, true)
-    } else {
+    }
+    else {
         cb(new Error(`Only ${filetypes} images can be uploaded`));
     }
 };
@@ -28,9 +29,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage: storage,
-    fileFilter: function (req, file, cb) {
-        checkFileType(file, cb)
-    }
+    // fileFilter: function (req, file, cb) {
+    //     checkFileType(file, cb)
+    // }
 });
 
 module.exports = {

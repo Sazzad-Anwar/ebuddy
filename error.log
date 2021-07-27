@@ -8,3 +8,51 @@
   error_occured: 'Sun, Jul 25, 2021, 12:10 PM',
   timestamp: '2021-07-25T06:10:06.903Z'
 }
+{
+  level: 'error',
+  message: 'Message is not defined',
+  IP: '::ffff:127.0.0.1',
+  stack: 'ReferenceError: Message is not defined\n' +
+    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\controllers\\AppController.js:92:26\n' +
+    '    at asyncUtilWrap (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express-async-handler\\index.js:3:20)\n' +
+    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:137:13)\n' +
+    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:131:14)\n' +
+    '    at Route.dispatch (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:112:3)\n' +
+    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:281:22\n' +
+    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)\n' +
+    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:275:10)\n' +
+    '    at Function.handle (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:174:3)\n' +
+    '    at router (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:47:12)\n' +
+    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:317:13)\n' +
+    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:284:7\n' +
+    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)',
+  error_occured: 'Tue, Jul 27, 2021, 11:09 AM',
+  timestamp: '2021-07-27T05:09:45.211Z'
+}
+{
+  level: 'error',
+  message: 'Message is not defined',
+  IP: '::ffff:127.0.0.1',
+  stack: 'ReferenceError: Message is not defined\n' +
+    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\controllers\\AppController.js:92:26\n' +
+    '    at asyncUtilWrap (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express-async-handler\\index.js:3:20)\n' +
+    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:137:13)\n' +
+    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:131:14)\n' +
+    '    at Route.dispatch (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:112:3)\n' +
+    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:281:22\n' +
+    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)\n' +
+    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:275:10)\n' +
+    '    at Function.handle (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:174:3)\n' +
+    '    at router (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:47:12)\n' +
+    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at trim_prefix (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:317:13)\n' +
+    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:284:7\n' +
+    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)',
+  error_occured: 'Tue, Jul 27, 2021, 11:11 AM',
+  timestamp: '2021-07-27T05:11:27.535Z'
+}

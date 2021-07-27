@@ -72,17 +72,13 @@ io.on('connection', (socket) => {
     })
 
     socket.on('message', async msg => {
-        const { user, from, file, to, message } = msg
-        let newMessage = new Message({
-            user,
-            from,
-            file,
-            to,
-            message
-        })
-        await newMessage.save();
-        socket.broadcast.emit('chat-message', newMessage)
+        socket.broadcast.emit('chat-message', msg)
     });
+
+    socket.on('messageDelete', async data => {
+        await Message.deleteOne({ _id: data });
+        io.emit('removeMsgFromChat', data);
+    })
 
     socket.on('disconnect', async () => {
         const leavingUser = await userLeave(socket.id);
@@ -97,7 +93,6 @@ io.on('connection', (socket) => {
             }
             io.emit('user-joined', userInfo)
         }
-
     })
 
     count++;

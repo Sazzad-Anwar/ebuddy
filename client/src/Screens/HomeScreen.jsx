@@ -2,25 +2,28 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prettier/prettier */
 // import { Typography } from '@material-ui/core';
-import { Button, Col, Container, Form, Image, Row } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
+import { Button, Col, Container, Form, Image, Nav, Navbar, Row } from 'react-bootstrap';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import axios from 'axios';
-import { Avatar, IconButton } from '@material-ui/core';
+import { Avatar, Checkbox, FormControlLabel, IconButton } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
+import CopyrightIcon from '@material-ui/icons/Copyright';
 import { userLogin } from '../Redux/Actons';
 
 const HomeScreen = () => {
     const { addToast } = useToasts();
-    const userData = useSelector((state) => state.userLogin);
+    const { user } = useSelector((state) => state.userLogin);
     const history = useHistory();
     const dispatch = useDispatch();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [images, setImages] = useState([]);
+    const [photoUploaded, setPhotoUploaded] = useState(false);
+    const footerRef = useRef(0);
 
     const uploadFile = async (e) => {
         const { files } = e.target;
@@ -32,6 +35,7 @@ const HomeScreen = () => {
         try {
             const { data } = await axios.post('/api/v1/upload', formData);
             data.map((image) => setImages((preImage) => [...preImage, image.filePath]));
+            setPhotoUploaded(true);
         } catch (error) {
             console.log(error.response);
         }
@@ -42,6 +46,7 @@ const HomeScreen = () => {
         console.log({ id, uploadId });
         await axios.delete(`/api/v1/upload/${uploadId}`);
         setImages(images.filter((singleImage) => singleImage !== id));
+        setPhotoUploaded(false);
     };
 
     const handleSubmit = (e) => {
@@ -58,18 +63,36 @@ const HomeScreen = () => {
         }
     };
     useEffect(() => {
-        if (userData && userData.user?.isLoggedIn) {
+        if (user && user?.isLoggedIn) {
             history.push('/chat');
         }
-    }, [history, userData]);
+    }, [history, dispatch, user]);
+
+    const handlePhotoUploaded = async () => {
+        try {
+            if (email && !photoUploaded) {
+                const { data } = await axios.get(`/api/v1/user?email=${email}`);
+                if (data.isSuccess) {
+                    setImages([data.user.photo]);
+                }
+            } else if (!email) {
+                addToast('Email can not be null', {
+                    autoDismiss: true,
+                    appearance: 'error',
+                });
+                setPhotoUploaded(false);
+            } else if (email && photoUploaded) {
+                setImages([]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <div className="bg-primary login__screen">
-            <Container className="pt-5">
-                <h3 className="text-white pt-5 text-center">
-                    Welcome to e-chat-Buddy
-                    <img className="app__logo ms-2" src="/logo.gif" alt="logo" />
-                </h3>
+            <Container className="">
+                <h3 className="text-white pt-5 text-center">e-chat-Buddy</h3>
                 <Row>
                     <Col lg={4} />
                     <Col xs={12} md={12} lg={4}>
@@ -77,8 +100,9 @@ const HomeScreen = () => {
                             <div className="d-flex justify-content-center align-items-center position-relative photo">
                                 <Avatar
                                     alt={name}
-                                    src={images[0]}
+                                    src={images[0] ?? '/logo.gif'}
                                     style={{ height: 150, width: 150 }}
+                                    className="shadow-lg border border-dark"
                                 />
                                 {images[0] && (
                                     <IconButton
@@ -109,19 +133,38 @@ const HomeScreen = () => {
                                     htmlFor="email"
                                 />
                             </Form.Group>
-                            <Form.Group className="mb-3" controlId="photo">
-                                <Form.Label className="text-white">Upload Your Photo</Form.Label>
-                                <div className="input-group mb-3">
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        accept="image/*"
-                                        onChange={uploadFile}
-                                        placeholder="Input Photos"
-                                        id="inputGroupFile02"
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={photoUploaded}
+                                        onChange={() => {
+                                            setPhotoUploaded(!photoUploaded);
+                                            handlePhotoUploaded();
+                                        }}
+                                        className="text-white"
                                     />
-                                </div>
-                            </Form.Group>
+                                }
+                                label="Photo is Uploaded"
+                                className="text-white"
+                            />
+
+                            {!photoUploaded && (
+                                <Form.Group className="mb-3" controlId="photo">
+                                    <Form.Label className="text-white">
+                                        Upload Your Photo
+                                    </Form.Label>
+                                    <div className="input-group mb-3">
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            accept="image/*"
+                                            onChange={uploadFile}
+                                            placeholder="Input Photos"
+                                            id="inputGroupFile02"
+                                        />
+                                    </div>
+                                </Form.Group>
+                            )}
 
                             <Button variant="outline-secondary w-100" type="submit">
                                 Login
@@ -131,6 +174,17 @@ const HomeScreen = () => {
                     <Col lg={4} />
                 </Row>
             </Container>
+            <Navbar className="nav__bar fixed-bottom" ref={footerRef} expand="lg">
+                <Container className="d-flex flex-column">
+                    <Nav className=" align-items-center py-2 text-white">
+                        Copyright <CopyrightIcon className="me-2" /> {new Date().getFullYear()}{' '}
+                        e-Chat-Buddy. All rights reserved.
+                    </Nav>
+                    <Nav className="align-items-center pb-4 text-white">
+                        Designed & Developed By Sazzad Bin Anwar
+                    </Nav>
+                </Container>
+            </Navbar>
         </div>
     );
 };

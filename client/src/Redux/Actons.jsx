@@ -16,7 +16,9 @@ export const userLogin = (user) => async (dispatch) => {
         });
 
         const { data } = await axios.post('/api/v1/user', user);
-        // localStorage.setItem('user', JSON.stringify(user));
+        console.log(data);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
         dispatch({
             type: USER_LOGIN_SUCCESS,
             payload: data.user,
@@ -30,7 +32,7 @@ export const userLogin = (user) => async (dispatch) => {
 };
 
 export const userLogout = () => async (dispatch) => {
-    // localStorage.removeItem('user');
+    localStorage.removeItem('user');
     dispatch({
         type: USER_LOGOUT,
     });
@@ -39,8 +41,7 @@ export const userLogout = () => async (dispatch) => {
 export const userUpdate = (user) => async (dispatch) => {
     try {
         const { data } = await axios.put('/api/v1/user', user);
-        console.log('from action', data.user);
-        // localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('user', JSON.stringify(data.user));
         dispatch({
             type: USER_UPDATE_SUCCESS,
             payload: data.user,

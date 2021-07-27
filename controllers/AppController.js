@@ -2,6 +2,7 @@
 const asyncHandler = require('express-async-handler');
 const { response, pagination, localTimeString } = require('../middlewares/middlewares');
 const User = require('../models/users');
+const Message = require('../models/messsages');
 const fs = require('fs');
 
 const uploadFile = asyncHandler(async (req, res) => {
@@ -60,9 +61,48 @@ const saveUser = asyncHandler(async (req, res) => {
 
         res.json({ user: updateUser });
     }
+    if (req.method === 'GET') {
+        const { email } = req.query;
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            res.json({
+                isSuccess: true,
+                user
+            });
+        } else {
+            res.json({ isSuccess: false, user: 'User image is not registered !' })
+        }
+
+
+    }
+
+});
+
+
+const message = asyncHandler(async (req, res) => {
+    if (req.method === 'GET') {
+
+        let messages = await Message.find();
+        res.json({ messages });
+    }
+    if (req.method === 'POST') {
+        let { user, from, file, to, message } = req.body;
+        let newMessage = new Message({
+            user,
+            from,
+            file,
+            to,
+            message
+        })
+
+        await newMessage.save();
+        res.json({ message: newMessage });
+    }
 
 });
 
 module.exports = {
-    uploadFile, fileDelete, saveUser
+    uploadFile, fileDelete, saveUser, message
 }

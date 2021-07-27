@@ -1,7 +1,7 @@
 //@Description: All types of application route's configuration is set in this file
 const express = require('express');
 const router = express.Router();
-const { uploadFile, fileDelete, saveUser } = require('../controllers/AppController');
+const { uploadFile, fileDelete, saveUser, message } = require('../controllers/AppController');
 const { upload } = require('../middlewares/multerMiddleware');
 
 //@Description:
@@ -9,8 +9,14 @@ const { upload } = require('../middlewares/multerMiddleware');
 //Access: user
 router
     .route('/user')
+    .get(saveUser)
     .post(saveUser)
     .put(saveUser);
+
+router
+    .route('/messages')
+    .get(message)
+    .post(message)
 
 router
     .route('/upload')

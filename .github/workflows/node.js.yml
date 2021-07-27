@@ -18,7 +18,7 @@ jobs:
                 node-version: [14.16.1]
                 # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
         env:
-            MONGO_URI: ${{secrets.MONGO_URI}}
+            MONGO_URI: ${{secrets.Database.MONGO_URI}}
         steps:
             - uses: actions/checkout@v2
             - name: Use Node.js ${{ matrix.node-version }}

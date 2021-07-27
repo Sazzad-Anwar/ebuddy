@@ -10,9 +10,9 @@ const messageSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    file: {
-        type: String,
-    },
+    file: [
+        { type: String, }
+    ],
     to: {
         type: String,
         required: true,
@@ -25,7 +25,7 @@ const messageSchema = mongoose.Schema({
         default: Date.now
     }
 }, {
-    timestamp: true
+    timestamps: true
 });
 
 const Message = mongoose.model('Message', messageSchema);

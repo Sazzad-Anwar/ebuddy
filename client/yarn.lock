@@ -5658,6 +5658,11 @@ file-loader@6.1.1:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
+file-saver@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-2.0.5.tgz#d61cfe2ce059f414d899e9dd6d4107ee25670c38"
+  integrity sha512-P9bmyZ3h/PRG+Nzga+rbdI4OEpNDzAVyy74uVO9ATgzLK6VtAsYybF/+TOCvrc0MO793d6+42lLyZTw7/ArVzA==
+
 file-selector@^0.2.2:
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/file-selector/-/file-selector-0.2.4.tgz#7b98286f9dbb9925f420130ea5ed0a69238d4d80"
@@ -10183,6 +10188,11 @@ react-scroll-to-bottom@^4.1.2:
     math-random "2.0.1"
     prop-types "15.7.2"
     simple-update-in "2.2.0"
+
+react-tiny-link@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/react-tiny-link/-/react-tiny-link-3.6.1.tgz#69da07660e16e2498c42458b09b02d4c41e6683c"
+  integrity sha512-spQghU5GqBWsLE8rKOTYo/h6MNoZJn8Gqs6jpeQuo/eq2bALkeOke2FfSswVOhGN8z8riDY+TqaJ2eaoNKtrAw==
 
 react-toast-notifications@^2.5.1:
   version "2.5.1"

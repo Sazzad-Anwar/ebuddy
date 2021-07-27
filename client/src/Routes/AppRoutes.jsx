@@ -1,13 +1,16 @@
+/* eslint-disable no-unused-vars */
 import { Switch, Route, Redirect } from 'react-router-dom';
 import HomeScreen from '../Screens/HomeScreen';
 import NotFound from '../CustomComponents/NotFound';
 import ProtectedRoute from '../Components/ProtectedRoute';
 import Login from '../Screens/Login';
 import Chat from '../Screens/Chat';
+import Test from '../Components/Test';
 
 const AppRoutes = () => (
     <Switch>
         <Route path="/login" component={Login} />
+        <Route path="/test" component={Test} />
         <ProtectedRoute path="/chat">
             <Chat />
         </ProtectedRoute>

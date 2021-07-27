@@ -23,7 +23,8 @@ const userLeave = async id => {
     let user = await User.findOne({ socketId: id });
     if (user) {
         await User.updateOne({ _id: user.id }, { $set: { isActive: false } });
-        return user
+
+        return await User.findOne({ socketId: id });;
     }
 }
 
