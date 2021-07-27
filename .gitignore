@@ -1,5 +1,5 @@
 /node_modules
+.env
 new.js
 new.html
 new.json
-.env
