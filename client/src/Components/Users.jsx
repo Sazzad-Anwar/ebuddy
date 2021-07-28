@@ -1,7 +1,14 @@
 import { Avatar, Badge, Card } from '@material-ui/core';
 import moment from 'moment';
 
-const Users = ({ userInfo, messages, findRoomUser }) => (
+const Users = ({
+    userInfo,
+    messages,
+    findRoomUser,
+    setReplyMsgDetails,
+    setDisplayMessages,
+    showMobileChat,
+}) => (
     <Card
         elevation={10}
         body
@@ -13,6 +20,8 @@ const Users = ({ userInfo, messages, findRoomUser }) => (
         style={{ cursor: 'pointer' }}
         onClick={() => {
             findRoomUser(userInfo.email);
+            setReplyMsgDetails('');
+            setDisplayMessages(!!showMobileChat);
         }}
     >
         <Badge

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-plusplus */
 /* eslint-disable jsx-a11y/label-has-associated-control */
@@ -20,7 +21,18 @@ import {
 } from 'react-bootstrap';
 import SearchIcon from '@material-ui/icons/Search';
 import { Link, NavLink, useHistory, useLocation } from 'react-router-dom';
-import { Avatar, Card, Badge, IconButton, CardMedia, Input } from '@material-ui/core';
+import {
+    Avatar,
+    Card,
+    Badge,
+    IconButton,
+    CardMedia,
+    Input,
+    MenuItem,
+    ListItemIcon,
+    Divider,
+    Menu,
+} from '@material-ui/core';
 import moment from 'moment';
 import { io } from 'socket.io-client';
 import ScrollToBottom from 'react-scroll-to-bottom';
@@ -34,6 +46,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import axios from 'axios';
 import CopyrightIcon from '@material-ui/icons/Copyright';
 import CancelIcon from '@material-ui/icons/Cancel';
+import PersonAdd from '@material-ui/icons/PersonAdd';
+import Settings from '@material-ui/icons/Settings';
+import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import { userLogout, userUpdate } from '../Redux/Actons';
 import Messages from '../Components/Messages';
 import Users from '../Components/Users';
@@ -54,9 +69,20 @@ const Chat = () => {
     const [roomUserPicShow, setRoomUserPicShow] = useState(false);
     const [replyMsgDetails, setReplyMsgDetails] = useState({});
     const [editMsgId, setEditMsgId] = useState('');
+    const [showMobileChat, setShowMobileChat] = useState(false);
+    const [displayMessages, setDisplayMessages] = useState(false);
     const heightRef = useRef(0);
     const footerRef = useRef(0);
+    const chatTextHeightRef = useRef(0);
     const audio = new Audio('/msg_sound.mp3');
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     // const socket = io('/');
     const socket = useRef(null);
@@ -120,6 +146,16 @@ const Chat = () => {
             history.push('/');
         }
 
+        if (window.innerWidth < 991) {
+            setShowMobileChat(true);
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth < 991) {
+                setShowMobileChat(true);
+            }
+        });
+
         return () => {
             socket.current.off('user-joined', (data) => {});
             socket.current.off('room-user-details', (userData) => {});
@@ -145,7 +181,7 @@ const Chat = () => {
             message,
             sendAt: Date.now(),
         };
-        if ((message && images) || images || e.key === 'Enter') {
+        if ((message && e.key === 'Enter') || message) {
             setMessage('');
             try {
                 const { data } = await axios.post('/api/v1/messages', chat);
@@ -232,30 +268,85 @@ const Chat = () => {
                             <span className="h4">Chat-Buddy</span>
                         </Navbar.Brand>
                     </Link>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="ms-auto align-items-center">
-                            <Nav.Link className="text-white fs-5">
-                                <NavLink to="/">Home</NavLink>
-                            </Nav.Link>
-                            <Nav.Link className="text-white fs-5">{user.name}</Nav.Link>
-                            <Nav.Link className="text-white fs-5">{user.email}</Nav.Link>
-                            <Nav.Link className="text-white">
-                                <IconButton
-                                    className="fs-7"
-                                    onClick={() => {
-                                        dispatch(userLogout());
-                                        socket.current.disconnect();
-                                        history.push('/');
-                                        localStorage.removeItem('roomUser');
-                                    }}
-                                >
-                                    <ExitToAppIcon className="text-white" />
-                                    <span className="logout">Logout</span>{' '}
-                                </IconButton>
-                            </Nav.Link>
-                        </Nav>
-                    </Navbar.Collapse>
+                    <Nav className="ms-auto align-items-center">
+                        <Nav.Link className="text-white fs-5">
+                            <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
+                                <Avatar
+                                    style={{ width: 32, height: 32 }}
+                                    src={user.photo}
+                                    alt={user.name}
+                                />
+                            </IconButton>
+                        </Nav.Link>
+
+                        {/* profile submenu */}
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            onClick={handleClose}
+                            style={{
+                                marginTop: heightRef.current.offsetHeight - 15,
+                            }}
+                            PaperProps={{
+                                elevation: 0,
+                                sx: {
+                                    overflow: 'visible',
+                                    filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                    mt: 1.5,
+                                    '& .MuiAvatar-root': {
+                                        width: 32,
+                                        height: 32,
+                                        ml: -0.5,
+                                        mr: 1,
+                                    },
+                                    '&:before': {
+                                        content: '""',
+                                        display: 'block',
+                                        position: 'absolute',
+                                        top: 0,
+                                        right: 14,
+                                        width: 10,
+                                        height: 10,
+                                        bgcolor: 'background.paper',
+                                        transform: 'translateY(-50%) rotate(45deg)',
+                                        zIndex: 0,
+                                    },
+                                },
+                            }}
+                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                        >
+                            <MenuItem>
+                                <Avatar
+                                    src={user.photo}
+                                    alt={user.name}
+                                    style={{ width: 32, height: 32, marginRight: 28 }}
+                                />{' '}
+                                {user.name}
+                            </MenuItem>
+                            <Divider />
+                            <MenuItem>
+                                <ListItemIcon>
+                                    <Settings fontSize="small" />
+                                </ListItemIcon>
+                                Settings
+                            </MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    dispatch(userLogout());
+                                    socket.current.disconnect();
+                                    history.push('/');
+                                    localStorage.removeItem('roomUser');
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <ExitToAppIcon fontSize="small" />
+                                </ListItemIcon>
+                                Logout
+                            </MenuItem>
+                        </Menu>
+                    </Nav>
                 </Container>
             </Navbar>
 
@@ -264,6 +355,7 @@ const Chat = () => {
                     <Row>
                         <Col
                             md={3}
+                            xs={12}
                             style={{
                                 height: `calc(100vh - ${
                                     heightRef.current.offsetHeight + footerRef.current.offsetHeight
@@ -294,33 +386,66 @@ const Chat = () => {
                                         messages={messages}
                                         findRoomUser={findRoomUser}
                                         key={userInfo.email}
+                                        setReplyMsgDetails={setReplyMsgDetails}
+                                        setDisplayMessages={setDisplayMessages}
+                                        showMobileChat={showMobileChat}
                                     />
                                 ))}
                         </Col>
-                        <Col md={9} className="bg-primary">
+                        <Col
+                            md={9}
+                            xs={12}
+                            className={
+                                showMobileChat
+                                    ? 'bg-primary position-absolute top-0 end-0 bottom-0 start-0'
+                                    : 'bg-primary'
+                            }
+                            style={{
+                                display:
+                                    showMobileChat && displayMessages
+                                        ? 'block'
+                                        : !showMobileChat
+                                        ? 'block'
+                                        : 'none',
+                            }}
+                        >
                             <main className="position-relative h-100">
                                 {roomUser.email ? (
                                     <>
                                         <section
-                                            className="message__header d-flex align-items-center py-4 px-2 border-bottom"
+                                            className="message__header d-flex justify-content-between align-items-center py-4 px-2 border-bottom"
                                             id="user__head"
                                         >
-                                            <Avatar
-                                                alt={roomUser.name}
-                                                src={roomUser.photo}
-                                                style={{ height: 50, width: 50, cursor: 'pointer' }}
-                                                onClick={() => setRoomUserPicShow(true)}
-                                            />
-                                            <div className="ps-3">
-                                                <h4 className="text-white my-0">{roomUser.name}</h4>
-                                                <p className="text-white my-0">
-                                                    {roomUser.isActive
-                                                        ? 'Online'
-                                                        : `Last Seen ${moment(
-                                                              roomUser.updatedAt
-                                                          ).calendar()}`}
-                                                </p>
+                                            <div className="d-flex">
+                                                <Avatar
+                                                    alt={roomUser.name}
+                                                    src={roomUser.photo}
+                                                    style={{
+                                                        height: 50,
+                                                        width: 50,
+                                                        cursor: 'pointer',
+                                                    }}
+                                                    onClick={() => setRoomUserPicShow(true)}
+                                                />
+                                                <div className="ps-3">
+                                                    <h4 className="text-white my-0">
+                                                        {roomUser.name}
+                                                    </h4>
+                                                    <p className="text-white my-0">
+                                                        {roomUser.isActive
+                                                            ? 'Online'
+                                                            : `Last Seen ${moment(
+                                                                  roomUser.updatedAt
+                                                              ).calendar()}`}
+                                                    </p>
+                                                </div>
                                             </div>
+                                            <IconButton
+                                                className="float-end mobile__back_btn"
+                                                onClick={() => setDisplayMessages(false)}
+                                            >
+                                                <ArrowRightAltIcon className="text-white" />
+                                            </IconButton>
                                         </section>
                                         <ScrollToBottom className="message__body overflow-auto position-relative">
                                             {messages &&
@@ -344,16 +469,24 @@ const Chat = () => {
                                             <form onSubmit={sendMessage} className="mb-2">
                                                 <Row>
                                                     {replyMsgDetails !== null &&
-                                                        replyMsgDetails.message && (
-                                                            <Col xs={10}>
-                                                                <div className="px-3 py-2">
-                                                                    <p className="mb-0 col-10 text-truncate text-white">
-                                                                        <b>Replying to:</b>
-                                                                        {replyMsgDetails.message}
-                                                                    </p>
-                                                                </div>
-                                                            </Col>
-                                                        )}
+                                                    replyMsgDetails.message ? (
+                                                        <Col xs={10}>
+                                                            <div className="px-3 py-2 bg-primary position-relative">
+                                                                <p className="mb-0 col-10 text-truncate text-white">
+                                                                    <b>Replying to : </b>
+                                                                    {replyMsgDetails.message}{' '}
+                                                                    <IconButton
+                                                                        className="position-absolute top-0 end-0"
+                                                                        onClick={() =>
+                                                                            setReplyMsgDetails('')
+                                                                        }
+                                                                    >
+                                                                        <CloseIcon className="text-white bg-dark rounded-circle" />
+                                                                    </IconButton>
+                                                                </p>
+                                                            </div>
+                                                        </Col>
+                                                    ) : null}
                                                     <Col xs={10}>
                                                         <Form.Group controlId="formBasicEmail">
                                                             <Form.Control
@@ -366,6 +499,7 @@ const Chat = () => {
                                                                         ? sendMessage(e)
                                                                         : setMessage(e.target.value)
                                                                 }
+                                                                ref={chatTextHeightRef}
                                                                 type="text"
                                                                 as="textarea"
                                                                 className="rounded text__input bg-primary text-white"
@@ -374,33 +508,33 @@ const Chat = () => {
                                                         </Form.Group>
                                                     </Col>
                                                     <Col xs={1}>
-                                                        <label
-                                                            htmlFor="icon-button-file"
-                                                            className="float-end"
-                                                        >
-                                                            <Input
-                                                                id="icon-button-file"
-                                                                type="file"
-                                                                onChange={uploadFile}
-                                                                hidden
-                                                            />
-                                                            <IconButton
-                                                                aria-label="upload picture"
-                                                                component="span"
-                                                                className="border p-2 input__file__button"
+                                                        <div className="d-flex">
+                                                            <label
+                                                                htmlFor="icon-button-file"
+                                                                className="float-end"
                                                             >
-                                                                <AttachmentIcon className="attachments__icon text-dark" />
-                                                            </IconButton>
-                                                        </label>
-                                                    </Col>
-                                                    <Col xs={1}>
-                                                        <Button
-                                                            variant="outline-secondary rounded-circle p-2 pl-3 shadow-lg float-start"
-                                                            className="ms-2"
-                                                            type="submit"
-                                                        >
-                                                            <SendIcon className="attachments__icon" />
-                                                        </Button>
+                                                                <Input
+                                                                    id="icon-button-file"
+                                                                    type="file"
+                                                                    onChange={uploadFile}
+                                                                    hidden
+                                                                />
+                                                                <IconButton
+                                                                    aria-label="upload picture"
+                                                                    component="span"
+                                                                    className="border p-2 input__file__button"
+                                                                >
+                                                                    <AttachmentIcon className="attachments__icon text-dark" />
+                                                                </IconButton>
+                                                            </label>
+                                                            <Button
+                                                                variant="outline-secondary rounded-circle p-2 pl-3 shadow-lg float-start"
+                                                                className="ms-2"
+                                                                type="submit"
+                                                            >
+                                                                <SendIcon className="attachments__icon" />
+                                                            </Button>
+                                                        </div>
                                                     </Col>
                                                 </Row>
                                             </form>
@@ -425,12 +559,7 @@ const Chat = () => {
             </section>
 
             {/* footer nav */}
-            <Navbar
-                style={{ background: '#000' }}
-                className="nav__bar "
-                ref={footerRef}
-                expand="lg"
-            >
+            <Navbar style={{ background: '#000' }} className="nav__bar" ref={footerRef} expand="lg">
                 <Container fluid={('sm', 'md')}>
                     <Nav className="me-auto align-items-center py-3 text-white">
                         Copyright <CopyrightIcon className="me-2" /> {new Date().getFullYear()}{' '}
@@ -500,10 +629,10 @@ const Chat = () => {
             >
                 <img alt={roomUser.name} src={roomUser.photo} />
                 <IconButton
-                    className="position-absolute top-0 end-0 bg-dark"
+                    className="position-absolute top-0 end-0"
                     onClick={() => setRoomUserPicShow(!roomUserPicShow)}
                 >
-                    <CloseIcon className="text-white" />
+                    <CloseIcon className="text-white bg-dark" />
                 </IconButton>
             </Modal>
         </div>

@@ -9,16 +9,10 @@ import moment from 'moment';
 import { Col, Modal, Popover, Row } from 'react-bootstrap';
 import CloseIcon from '@material-ui/icons/Close';
 import { useState } from 'react';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import FileSaver from 'file-saver';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import ZoomInIcon from '@material-ui/icons/ZoomIn';
-import path from 'path';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ReplyIcon from '@material-ui/icons/Reply';
-import { host } from '../Config.json';
 import MessageContainingFile from './MessageContainingFile';
 
 const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg }) => {
@@ -33,8 +27,6 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
         setAnchorEl(null);
     };
 
-    console.log(show);
-
     if (
         user.email !== messageDetails.from &&
         roomUser.email === messageDetails.from &&
@@ -42,11 +34,15 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
     ) {
         return (
             <div className="d-flex my-3 chat__buddy" style={{ marginRight: '20%' }}>
-                <Avatar alt={roomUser.name} src={roomUser.photo} />
+                <Avatar
+                    alt={roomUser.name}
+                    src={roomUser.photo}
+                    style={{ width: 32, height: 32 }}
+                />
                 <div>
                     <div className="d-flex">
                         {messageDetails.message && (
-                            <div className="chat__card chat__person ms-3 p-2">
+                            <div className="chat__card chat__person ms-0 p-2">
                                 {messageDetails.repliedOf && (
                                     <Card
                                         body
@@ -230,7 +226,11 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                         )}
                     </div>
 
-                    <Avatar alt={user.name} src={user.photo} />
+                    <Avatar
+                        alt={user.name}
+                        src={user.photo}
+                        style={{ width: 32, height: 32, marginRight: 10 }}
+                    />
                 </div>
                 <p className="text-white mt-1 pe-5 last__seen">
                     {moment(messageDetails.updatedAt).fromNow()}

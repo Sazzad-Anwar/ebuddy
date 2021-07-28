@@ -34,6 +34,26 @@ custom-control-input:not(checked),
     box-shadow: inset 0 0px 0 #ddd !important;
 }
 
+::-webkit-scrollbar {
+    display: block;
+}
+::-webkit-scrollbar {
+    width: 0.6rem;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3) !important;
+    -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3) !important;
+    border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px !important;
+    background-color: #1c2834 !important;
+    box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.5) !important;
+    -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.5) !important;
+}
+
 .message__body {
     height: calc(100vh - 300px);
 }
@@ -128,6 +148,10 @@ custom-control-input:not(checked),
     border-radius: 10px !important;
 }
 
+.mobile__back_btn {
+    display: none !important;
+}
+
 @media only screen and (max-width: 991px) and (min-width: 320px) {
     .nav__bar {
         padding: 10px !important;
@@ -136,5 +160,8 @@ custom-control-input:not(checked),
         display: block;
         margin-right: 10px;
         color: #fff;
+    }
+    .mobile__back_btn {
+        display: block !important;
     }
 }
