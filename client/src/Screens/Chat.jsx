@@ -74,6 +74,7 @@ const Chat = () => {
     const heightRef = useRef(0);
     const footerRef = useRef(0);
     const chatTextHeightRef = useRef(0);
+    const textAreaRef = useRef(null);
     const audio = new Audio('/msg_sound.mp3');
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -156,14 +157,17 @@ const Chat = () => {
             }
         });
 
+        replyMsgDetails !== null && replyMsgDetails.message ? textAreaRef.current.focus() : null;
+
         return () => {
             socket.current.off('user-joined', (data) => {});
             socket.current.off('room-user-details', (userData) => {});
             socket.current.off('chat-message', (chat) => {});
             socket.current.off('removeMsgFromChat', (data) => {});
+            window.removeEventListener('resize', () => {});
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [addToast, user, search]);
+    }, [addToast, user, search, replyMsgDetails]);
 
     const findRoomUser = (email) => {
         setRoomUser(users.filter((userInfo) => userInfo.email === email)[0]);
@@ -469,26 +473,33 @@ const Chat = () => {
                                             <form onSubmit={sendMessage} className="mb-2">
                                                 <Row>
                                                     {replyMsgDetails !== null &&
-                                                    replyMsgDetails.message ? (
-                                                        <Col xs={10}>
-                                                            <div className="px-3 py-2 bg-primary position-relative">
-                                                                <p className="mb-0 col-10 text-truncate text-white">
-                                                                    <b>Replying to : </b>
-                                                                    {replyMsgDetails.message}{' '}
-                                                                    <IconButton
-                                                                        className="position-absolute top-0 end-0"
-                                                                        onClick={() =>
-                                                                            setReplyMsgDetails('')
-                                                                        }
-                                                                    >
-                                                                        <CloseIcon className="text-white bg-dark rounded-circle" />
-                                                                    </IconButton>
-                                                                </p>
-                                                            </div>
-                                                        </Col>
-                                                    ) : null}
+                                                        replyMsgDetails.message && (
+                                                            <Col xs={10}>
+                                                                <div className="px-3 py-2 bg-primary position-relative">
+                                                                    <p className="mb-0 col-10 text-truncate text-white">
+                                                                        <b>Replying to : </b>
+                                                                        {
+                                                                            replyMsgDetails.message
+                                                                        }{' '}
+                                                                        <IconButton
+                                                                            className="position-absolute top-0 end-0"
+                                                                            onClick={() =>
+                                                                                setReplyMsgDetails(
+                                                                                    ''
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <CloseIcon className="text-white bg-dark rounded-circle" />
+                                                                        </IconButton>
+                                                                    </p>
+                                                                </div>
+                                                            </Col>
+                                                        )}
                                                     <Col xs={10}>
-                                                        <Form.Group controlId="formBasicEmail">
+                                                        <Form.Group
+                                                            controlId="formBasicEmail"
+                                                            ref={chatTextHeightRef}
+                                                        >
                                                             <Form.Control
                                                                 value={message}
                                                                 onChange={(e) =>
@@ -499,7 +510,7 @@ const Chat = () => {
                                                                         ? sendMessage(e)
                                                                         : setMessage(e.target.value)
                                                                 }
-                                                                ref={chatTextHeightRef}
+                                                                ref={textAreaRef}
                                                                 type="text"
                                                                 as="textarea"
                                                                 className="rounded text__input bg-primary text-white"

@@ -39,17 +39,19 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                     src={roomUser.photo}
                     style={{ width: 32, height: 32 }}
                 />
-                <div>
+                <div className="d-flex flex-column align-items-start">
                     <div className="d-flex">
                         {messageDetails.message && (
                             <div className="chat__card chat__person ms-0 p-2">
                                 {messageDetails.repliedOf && (
                                     <Card
                                         body
-                                        className="chat__card chat__person p-2 bg-dark text-white col-4 text-truncate"
+                                        className="chat__card chat__person p-2 chat__reply text-white col-4 text-truncate rounded-top"
                                         style={{ width: '100%' }}
                                     >
-                                        {messageDetails.repliedOf}
+                                        <i>
+                                            {messageDetails.repliedOf} <ReplyIcon />
+                                        </i>
                                     </Card>
                                 )}
 
@@ -106,7 +108,7 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                     </div>
 
                     {messageDetails.file && (
-                        <Row>
+                        <Row className="ms-2">
                             {messageDetails.file.map((fileData) => (
                                 <MessageContainingFile
                                     fileData={fileData}
@@ -116,7 +118,7 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                             ))}
                         </Row>
                     )}
-                    <p className="text-white ms-3 mt-1 last__seen">
+                    <p className="text-white ms-2 mt-1 last__seen">
                         {moment(messageDetails.updatedAt).fromNow()}
                     </p>
                 </div>
@@ -182,48 +184,52 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                             </MenuItem>
                         </Menu>
 
-                        {messageDetails.message && (
-                            <div className="chat__person me-3 p-2">
-                                {messageDetails.repliedOf && (
+                        <div className="d-flex flex-column justify-content-end align-items-center">
+                            {messageDetails.message && (
+                                <div className="chat__person p-2">
+                                    {messageDetails.repliedOf && (
+                                        <Card
+                                            body
+                                            className="chat__person p-2 chat__reply text-white col-4 text-truncate"
+                                            style={{ width: '100%' }}
+                                        >
+                                            <i>
+                                                {messageDetails.repliedOf} <ReplyIcon />
+                                            </i>
+                                        </Card>
+                                    )}
                                     <Card
                                         body
-                                        className="chat__person me-3 p-2 bg-dark text-white col-4 text-truncate"
+                                        className="chat__person p-2"
                                         style={{ width: '100%' }}
                                     >
-                                        {messageDetails.repliedOf}
+                                        {messageDetails.message.startsWith('http') ? (
+                                            <ReactTinyLink
+                                                cardSize="small"
+                                                showGraphic={true}
+                                                maxLine={2}
+                                                minLine={1}
+                                                proxyUrl="https://corsanywhere.herokuapp.com"
+                                                url={messageDetails.message}
+                                            />
+                                        ) : (
+                                            messageDetails.message
+                                        )}
                                     </Card>
-                                )}
-                                <Card
-                                    body
-                                    className="chat__person me-3 p-2"
-                                    style={{ width: '100%' }}
-                                >
-                                    {messageDetails.message.startsWith('http') ? (
-                                        <ReactTinyLink
-                                            cardSize="small"
-                                            showGraphic={true}
-                                            maxLine={2}
-                                            minLine={1}
-                                            proxyUrl="https://corsanywhere.herokuapp.com"
-                                            url={messageDetails.message}
+                                </div>
+                            )}
+                            {messageDetails.file && (
+                                <Row>
+                                    {messageDetails.file.map((fileData) => (
+                                        <MessageContainingFile
+                                            fileData={fileData}
+                                            setShow={setShow}
+                                            setChatImage={setChatImage}
                                         />
-                                    ) : (
-                                        messageDetails.message
-                                    )}
-                                </Card>
-                            </div>
-                        )}
-                        {messageDetails.file && (
-                            <Row>
-                                {messageDetails.file.map((fileData) => (
-                                    <MessageContainingFile
-                                        fileData={fileData}
-                                        setShow={setShow}
-                                        setChatImage={setChatImage}
-                                    />
-                                ))}
-                            </Row>
-                        )}
+                                    ))}
+                                </Row>
+                            )}
+                        </div>
                     </div>
 
                     <Avatar
@@ -232,7 +238,7 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                         style={{ width: 32, height: 32, marginRight: 10 }}
                     />
                 </div>
-                <p className="text-white mt-1 pe-5 last__seen">
+                <p className="text-white mt-1 me-3 pe-5 last__seen">
                     {moment(messageDetails.updatedAt).fromNow()}
                 </p>
 

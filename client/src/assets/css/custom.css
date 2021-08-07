@@ -152,6 +152,10 @@ custom-control-input:not(checked),
     display: none !important;
 }
 
+.chat__reply {
+    background-color: #616161 !important;
+}
+
 @media only screen and (max-width: 991px) and (min-width: 320px) {
     .nav__bar {
         padding: 10px !important;

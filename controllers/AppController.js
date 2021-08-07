@@ -74,8 +74,6 @@ const saveUser = asyncHandler(async (req, res) => {
         } else {
             res.json({ isSuccess: false, user: 'User image is not registered !' })
         }
-
-
     }
 
 });
