@@ -46,12 +46,14 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                                 {messageDetails.repliedOf && (
                                     <Card
                                         body
-                                        className="chat__card chat__person p-2 chat__reply text-white col-4 text-truncate rounded-top"
-                                        style={{ width: '100%' }}
+                                        className="chat__card chat__person p-2 chat__reply text-white rounded-top"
                                     >
-                                        <i>
-                                            {messageDetails.repliedOf} <ReplyIcon />
-                                        </i>
+                                        {`${
+                                            messageDetails.repliedOf.length > 200
+                                                ? messageDetails.repliedOf.substring(0, 200)
+                                                : messageDetails.repliedOf
+                                        }...`}{' '}
+                                        <ReplyIcon />
                                     </Card>
                                 )}
 
@@ -114,6 +116,7 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                                     fileData={fileData}
                                     setShow={setShow}
                                     setChatImage={setChatImage}
+                                    key={fileData}
                                 />
                             ))}
                         </Row>
@@ -190,12 +193,10 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                                     {messageDetails.repliedOf && (
                                         <Card
                                             body
-                                            className="chat__person p-2 chat__reply text-white col-4 text-truncate"
-                                            style={{ width: '100%' }}
+                                            className="chat__person p-2 chat__reply text-white"
                                         >
-                                            <i>
-                                                {messageDetails.repliedOf} <ReplyIcon />
-                                            </i>
+                                            {`${messageDetails.repliedOf.substring(0, 200)}...`}{' '}
+                                            <ReplyIcon />
                                         </Card>
                                     )}
                                     <Card
@@ -225,6 +226,8 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                                             fileData={fileData}
                                             setShow={setShow}
                                             setChatImage={setChatImage}
+                                            key={fileData}
+                                            fileLength={messageDetails.file.length}
                                         />
                                     ))}
                                 </Row>

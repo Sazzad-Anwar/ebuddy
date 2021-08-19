@@ -4,11 +4,8 @@ import { Col } from 'react-bootstrap';
 import path from 'path';
 import CancelIcon from '@material-ui/icons/Cancel';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import { useRef } from 'react';
 
 const UploadPreview = ({ fileData, removeFile }) => {
-    const cardHeight = useRef(0);
-
     if (
         path.extname(fileData) === '.png' ||
         path.extname(fileData) === '.jpg' ||
@@ -23,13 +20,13 @@ const UploadPreview = ({ fileData, removeFile }) => {
                     style={{
                         position: 'relative',
                         height: 200,
-                        width: 200,
+                        width: '100%',
                     }}
                 >
                     <img
                         src={fileData}
                         height={200}
-                        width={200}
+                        width="auto"
                         className="position-absolute"
                         alt={`upload-${fileData}`}
                         style={{
@@ -40,7 +37,7 @@ const UploadPreview = ({ fileData, removeFile }) => {
                         }}
                     />
                     <CancelIcon
-                        className="position-absolute"
+                        className="position-absolute bg-white text-dark"
                         style={{
                             right: 0,
                             top: 0,
@@ -77,7 +74,7 @@ const UploadPreview = ({ fileData, removeFile }) => {
                         />
                     </video>
                     <CancelIcon
-                        className="position-absolute"
+                        className="position-absolute bg-white text-dark"
                         style={{
                             right: 0,
                             top: 0,
@@ -105,7 +102,7 @@ const UploadPreview = ({ fileData, removeFile }) => {
                         />
                     </audio>
                     <CancelIcon
-                        className="position-absolute"
+                        className="position-absolute bg-white text-dark"
                         style={{
                             right: 0,
                             top: 0,
@@ -117,7 +114,6 @@ const UploadPreview = ({ fileData, removeFile }) => {
             </Col>
         );
     }
-    console.log(cardHeight.current.offsetHeight);
     return (
         <Col xs={12} md={6} className="g-2" key={fileData}>
             <Card

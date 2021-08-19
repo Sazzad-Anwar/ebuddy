@@ -1,7 +1,6 @@
-/* eslint-disable no-unused-vars */
 import { useState } from 'react';
 
-const Test = () => {
+const DragNDrop = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
 
     console.log('hello');
@@ -25,6 +24,7 @@ const Test = () => {
     const fileDrop = (e) => {
         e.preventDefault();
         const { files } = e.dataTransfer;
+        console.log(files);
         if (files.length) {
             handleFiles(files);
         }
@@ -33,16 +33,11 @@ const Test = () => {
     return (
         <div>
             <div
-                className="drop-container d-flex justify-content-center align-items-center"
+                className="drop-container"
                 onDragOver={dragOver}
                 onDragEnter={dragEnter}
                 onDragLeave={dragLeave}
                 onDrop={fileDrop}
-                style={{
-                    height: 300,
-                    width: 300,
-                    border: '1px solid black',
-                }}
             >
                 <div className="drop-message">
                     <div className="upload-icon" />
@@ -50,7 +45,7 @@ const Test = () => {
                 </div>
             </div>
             <div className="files">
-                {/* {selectedFiles.map((data) => (
+                {selectedFiles.map((data) => (
                     <div className="file-status-bar" key={data.name}>
                         <div>
                             <div className="file-type-logo" />
@@ -62,10 +57,10 @@ const Test = () => {
                         </div>
                         <div className="file-remove">X</div>
                     </div>
-                ))} */}
+                ))}
             </div>
         </div>
     );
 };
 
-export default Test;
+export default DragNDrop;

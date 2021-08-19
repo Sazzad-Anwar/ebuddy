@@ -2,7 +2,10 @@
 const asyncHandler = require('express-async-handler');
 const { response, pagination, localTimeString } = require('../middlewares/middlewares');
 const User = require('../models/users');
+const mongoose = require('mongoose');
 const Message = require('../models/messsages');
+const FriendRequests = require('../models/friendRequests');
+const Friends = require('../models/friends');
 const fs = require('fs');
 
 const uploadFile = asyncHandler(async (req, res) => {
@@ -27,33 +30,47 @@ const fileDelete = asyncHandler(async (req, res) => {
 })
 
 const saveUser = asyncHandler(async (req, res) => {
+
     if (req.method === 'POST') {
-        const { name, email, photo } = req.body;
-        let userExist = await User.findOne({ email });
-        if (!userExist) {
 
-            let newUser = new User({
-                socketId: '', name, email, photo: photo ?? '', isLoggedIn: true
-            })
+        const { name, email, photo, id } = req.body;
 
-            await newUser.save();
-            res.json({ user: newUser });
-        }
-        else {
-            await User.updateOne({ email }, {
-                $set: {
-                    name,
-                    photo: photo ?? userExist.photo
-                }
-            })
-            let user = await User.findOne({ email });
+        if (id) {
+
+            let user = await User.findById({ _id: id })
             res.json({ user });
+
+        } else {
+
+            let userExist = await User.findOne({ email });
+
+            if (!userExist) {
+
+                let newUser = new User({
+                    socketId: '', name, email, photo: photo ?? '', isLoggedIn: true
+                })
+
+                await newUser.save();
+                res.json({ user: newUser });
+            }
+            else {
+                await User.updateOne({ email }, {
+                    $set: {
+                        name,
+                        photo: photo ?? userExist.photo
+                    }
+                })
+                let user = await User.findOne({ email })
+                res.json({ user });
+            }
         }
     }
     if (req.method === 'PUT') {
+
         const { _id, socketId, name, email, photo } = req.body;
 
         let updateUser = await User.findByIdAndUpdate({ _id }, {
+
             $set: {
                 socketId, name, email, photo
             }
@@ -61,18 +78,35 @@ const saveUser = asyncHandler(async (req, res) => {
 
         res.json({ user: updateUser });
     }
-    if (req.method === 'GET') {
-        const { email } = req.query;
 
-        let user = await User.findOne({ email });
+    if (req.method === 'GET') {
+
+        const { search } = req.query;
+
+        let user = await User.findOne({
+            $or: [
+                { email: search },
+                {
+                    name: {
+                        $regex: search,
+                        $options: 'i'
+                    }
+                }
+            ]
+        });
 
         if (user) {
+            let userWithDetails = await FriendRequests.findOne({ user: user._id }).populate({ path: 'friends friendRequests', options: { sort: ['createdAt'] } });
+            let friendList = await Friends.findOne({ user: user._id }).populate({ path: 'friends friendRequests', options: { sort: ['createdAt'] } });
+
             res.json({
                 isSuccess: true,
-                user
+                user,
+                friendRequests: userWithDetails?.friendRequests,
+                friends: friendList?.friends
             });
         } else {
-            res.json({ isSuccess: false, user: 'User image is not registered !' })
+            res.json({ isSuccess: false, user: 'User is not registered !' })
         }
     }
 
@@ -81,6 +115,7 @@ const saveUser = asyncHandler(async (req, res) => {
 
 const message = asyncHandler(async (req, res) => {
     if (req.method === 'GET') {
+
         let { messageType } = req.query;
 
         if (messageType === 'seen') {
@@ -134,6 +169,65 @@ const message = asyncHandler(async (req, res) => {
 
 });
 
+
+const addFriend = asyncHandler(async (req, res) => {
+
+    if (req.method === 'GET') {
+        let { _id } = req.query;
+        let userDetails = await FriendRequests.findById(_id)
+        res.json({ userDetails })
+    }
+
+    if (req.method === 'POST') {
+        const { friendId, myId } = req.body;
+
+        if (friendId !== myId) {
+            let requestFound = await User.findOne({ _id: friendId }).populate('friends friendRequests');
+
+            if (!requestFound.friendRequests.filter(friend => friend._id === myId).length) {
+                res.json({
+                    isSuccess: true,
+                    message: 'Request has sent already'
+                })
+            } else {
+                await User.findOneAndUpdate({ _id: friendId }, { $push: { friendRequests: myId } }, { upsert: true, new: true });
+
+                res.json({
+                    isSuccess: true,
+                    message: 'Request Sent'
+                })
+            }
+
+
+        } else {
+            res.json({
+                isSuccess: false,
+                message: 'Can not send friend request to your ID'
+            })
+        }
+    }
+
+    if (req.method === 'PUT') {
+        let { requestIdRemove, userId } = req.body;
+
+        await User.findOneAndUpdate({ _id: userId }, { $pull: { friendRequests: requestIdRemove } });
+
+        res.json({
+            isSuccess: true,
+            message: 'Request Removed'
+        })
+
+    }
+
+
+});
+
+const deleteMsg = asyncHandler(async (req, res) => {
+    await Message.deleteMany()
+    res.json({ message: 'deleted' })
+})
+
+
 module.exports = {
-    uploadFile, fileDelete, saveUser, message
+    uploadFile, fileDelete, saveUser, message, addFriend, deleteMsg
 }

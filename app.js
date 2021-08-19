@@ -21,7 +21,7 @@ const {
     errorHandler,
     notFound
 } = require('./middlewares/middlewares');
-const { joinUsers, userLeave, getRoomUser, getAllUser } = require('./libs/users');
+const { joinUsers, userLeave, getRoomUser, getAllUser, friendRequestSend, friendRequestDeclined, friendRequestAccepted } = require('./libs/users');
 const Message = require('./models/messsages');
 const User = require('./models/users');
 
@@ -50,7 +50,10 @@ io.on('connection', (socket) => {
     console.log(`Socket connected ${count}`.cyan);
 
     socket.on('user-login', async data => {
-        const joinedUser = await joinUsers(socket.id, data.email, data.photo)
+
+        console.log('user-login event called');
+
+        const joinedUser = await joinUsers(socket.id, data.email, data.photo, data.name)
         const allUsers = await getAllUser();
 
         let userInfo = {
@@ -64,23 +67,43 @@ io.on('connection', (socket) => {
         });
     })
 
-
     socket.on('room-user', email => {
+        console.log('room-user event called');
         let user = getRoomUser(email)
         socket.join(email);
         io.to(email).emit('room-user-details', user)
     })
 
+    socket.on('friend-request-send', async data => {
+        console.log('friend-request-send event called');
+        let { requestReceiver, requestSender, message, requestSenderUser } = await friendRequestSend(data.friendId, data.myId)
+        io.emit('friend-request', ({ requestReceiver, requestSender, message, requestSenderUser }))
+    })
+
+    socket.on('friend-request-declined', async data => {
+        console.log('friend-request-declined event called');
+        let { message } = await friendRequestDeclined(data);
+    })
+
+    socket.on('friend-request-accepted', async data => {
+        console.log('friend-request-accepted event called');
+        let { requestId, userId } = await friendRequestAccepted(data);
+        io.emit('friend-list', ({ requestId, userId }));
+    })
+
     socket.on('message', async msg => {
+        console.log('message event called');
         socket.broadcast.emit('chat-message', msg)
     });
 
     socket.on('messageDelete', async data => {
+        console.log('messageDelete event called');
         await Message.deleteOne({ _id: data });
         io.emit('removeMsgFromChat', data);
     })
 
     socket.on('disconnect', async () => {
+        console.log('disconnect event called');
         const leavingUser = await userLeave(socket.id);
         const allUsers = await getAllUser()
         if (leavingUser) {

@@ -80,6 +80,10 @@ custom-control-input:not(checked),
     font-weight: bolder;
 }
 
+.bg__green {
+    background-color: #006551 !important;
+}
+
 .text__not__active {
     color: red !important;
     font-weight: bolder;
@@ -118,6 +122,10 @@ custom-control-input:not(checked),
 .img__card:hover .download__btn {
     opacity: 1;
     background-color: rgba(0, 0, 0, 0.4);
+}
+
+.input__area {
+    height: auto;
 }
 
 .attachments__icon {

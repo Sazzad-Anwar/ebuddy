@@ -1,58 +1,80 @@
 {
   level: 'error',
-  message: "Cannot access 'user' before initialization",
+  message: '$regex has to be a string',
   IP: '::ffff:127.0.0.1',
-  stack: "ReferenceError: Cannot access 'user' before initialization\n" +
-    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\controllers\\AppController.js:45:37\n' +
-    '    at processTicksAndRejections (internal/process/task_queues.js:93:5)',
-  error_occured: 'Sun, Jul 25, 2021, 12:10 PM',
-  timestamp: '2021-07-25T06:10:06.903Z'
+  stack: 'MongoError: $regex has to be a string\n' +
+    '    at MessageStream.messageHandler (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\connection.js:272:20)\n' +
+    '    at MessageStream.emit (events.js:315:20)\n' +
+    '    at processIncomingData (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:144:12)\n' +
+    '    at MessageStream._write (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:42:5)\n' +
+    '    at writeOrBuffer (internal/streams/writable.js:358:12)\n' +
+    '    at MessageStream.Writable.write (internal/streams/writable.js:303:10)\n' +
+    '    at Socket.ondata (internal/streams/readable.js:719:22)\n' +
+    '    at Socket.emit (events.js:315:20)\n' +
+    '    at addChunk (internal/streams/readable.js:309:12)\n' +
+    '    at readableAddChunk (internal/streams/readable.js:284:9)\n' +
+    '    at Socket.Readable.push (internal/streams/readable.js:223:10)\n' +
+    '    at TCP.onStreamRead (internal/stream_base_commons.js:188:23)',
+  error_occured: 'Fri, Aug 20, 2021, 12:57 AM',
+  timestamp: '2021-08-19T18:57:16.287Z'
 }
 {
   level: 'error',
-  message: 'Message is not defined',
+  message: '$regex has to be a string',
   IP: '::ffff:127.0.0.1',
-  stack: 'ReferenceError: Message is not defined\n' +
-    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\controllers\\AppController.js:92:26\n' +
-    '    at asyncUtilWrap (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express-async-handler\\index.js:3:20)\n' +
-    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:137:13)\n' +
-    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:131:14)\n' +
-    '    at Route.dispatch (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:112:3)\n' +
-    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:281:22\n' +
-    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)\n' +
-    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:275:10)\n' +
-    '    at Function.handle (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:174:3)\n' +
-    '    at router (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:47:12)\n' +
-    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-    '    at trim_prefix (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:317:13)\n' +
-    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:284:7\n' +
-    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)',
-  error_occured: 'Tue, Jul 27, 2021, 11:09 AM',
-  timestamp: '2021-07-27T05:09:45.211Z'
+  stack: 'MongoError: $regex has to be a string\n' +
+    '    at MessageStream.messageHandler (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\connection.js:272:20)\n' +
+    '    at MessageStream.emit (events.js:315:20)\n' +
+    '    at processIncomingData (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:144:12)\n' +
+    '    at MessageStream._write (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:42:5)\n' +
+    '    at writeOrBuffer (internal/streams/writable.js:358:12)\n' +
+    '    at MessageStream.Writable.write (internal/streams/writable.js:303:10)\n' +
+    '    at Socket.ondata (internal/streams/readable.js:719:22)\n' +
+    '    at Socket.emit (events.js:315:20)\n' +
+    '    at addChunk (internal/streams/readable.js:309:12)\n' +
+    '    at readableAddChunk (internal/streams/readable.js:284:9)\n' +
+    '    at Socket.Readable.push (internal/streams/readable.js:223:10)\n' +
+    '    at TCP.onStreamRead (internal/stream_base_commons.js:188:23)',
+  error_occured: 'Fri, Aug 20, 2021, 12:57 AM',
+  timestamp: '2021-08-19T18:57:22.263Z'
 }
 {
   level: 'error',
-  message: 'Message is not defined',
+  message: '$regex has to be a string',
   IP: '::ffff:127.0.0.1',
-  stack: 'ReferenceError: Message is not defined\n' +
-    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\controllers\\AppController.js:92:26\n' +
-    '    at asyncUtilWrap (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express-async-handler\\index.js:3:20)\n' +
-    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:137:13)\n' +
-    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:131:14)\n' +
-    '    at Route.dispatch (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\route.js:112:3)\n' +
-    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:281:22\n' +
-    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)\n' +
-    '    at next (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:275:10)\n' +
-    '    at Function.handle (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:174:3)\n' +
-    '    at router (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:47:12)\n' +
-    '    at Layer.handle [as handle_request] (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
-    '    at trim_prefix (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:317:13)\n' +
-    '    at D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:284:7\n' +
-    '    at Function.process_params (D:\\PROJECTS\\React-Testing\\eBuddy\\node_modules\\express\\lib\\router\\index.js:335:12)',
-  error_occured: 'Tue, Jul 27, 2021, 11:11 AM',
-  timestamp: '2021-07-27T05:11:27.535Z'
+  stack: 'MongoError: $regex has to be a string\n' +
+    '    at MessageStream.messageHandler (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\connection.js:272:20)\n' +
+    '    at MessageStream.emit (events.js:315:20)\n' +
+    '    at processIncomingData (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:144:12)\n' +
+    '    at MessageStream._write (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:42:5)\n' +
+    '    at writeOrBuffer (internal/streams/writable.js:358:12)\n' +
+    '    at MessageStream.Writable.write (internal/streams/writable.js:303:10)\n' +
+    '    at Socket.ondata (internal/streams/readable.js:719:22)\n' +
+    '    at Socket.emit (events.js:315:20)\n' +
+    '    at addChunk (internal/streams/readable.js:309:12)\n' +
+    '    at readableAddChunk (internal/streams/readable.js:284:9)\n' +
+    '    at Socket.Readable.push (internal/streams/readable.js:223:10)\n' +
+    '    at TCP.onStreamRead (internal/stream_base_commons.js:188:23)',
+  error_occured: 'Fri, Aug 20, 2021, 01:06 AM',
+  timestamp: '2021-08-19T19:06:11.198Z'
+}
+{
+  level: 'error',
+  message: '$regex has to be a string',
+  IP: '::ffff:127.0.0.1',
+  stack: 'MongoError: $regex has to be a string\n' +
+    '    at MessageStream.messageHandler (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\connection.js:272:20)\n' +
+    '    at MessageStream.emit (events.js:315:20)\n' +
+    '    at processIncomingData (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:144:12)\n' +
+    '    at MessageStream._write (D:\\PROJECTS\\eBuddy\\node_modules\\mongodb\\lib\\cmap\\message_stream.js:42:5)\n' +
+    '    at writeOrBuffer (internal/streams/writable.js:358:12)\n' +
+    '    at MessageStream.Writable.write (internal/streams/writable.js:303:10)\n' +
+    '    at Socket.ondata (internal/streams/readable.js:719:22)\n' +
+    '    at Socket.emit (events.js:315:20)\n' +
+    '    at addChunk (internal/streams/readable.js:309:12)\n' +
+    '    at readableAddChunk (internal/streams/readable.js:284:9)\n' +
+    '    at Socket.Readable.push (internal/streams/readable.js:223:10)\n' +
+    '    at TCP.onStreamRead (internal/stream_base_commons.js:188:23)',
+  error_occured: 'Fri, Aug 20, 2021, 01:08 AM',
+  timestamp: '2021-08-19T19:08:25.482Z'
 }

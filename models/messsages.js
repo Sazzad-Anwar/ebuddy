@@ -27,6 +27,9 @@ const messageSchema = mongoose.Schema({
     isSeen: {
         type: Boolean,
     },
+    emoji: {
+        type: String,
+    },
     sendAt: {
         type: Date,
         default: Date.now

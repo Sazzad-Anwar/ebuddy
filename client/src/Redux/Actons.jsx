@@ -7,6 +7,12 @@ import {
     USER_LOGOUT,
     USER_UPDATE_FAILED,
     USER_UPDATE_SUCCESS,
+    FRIEND_REQUEST_ERROR,
+    FRIEND_REQUEST_SUCCESS,
+    GET_FRIENDS_SUCCESS,
+    GET_FRIENDS_ERROR,
+    GET_CHAT_MESSAGE_ERROR,
+    GET_CHAT_MESSAGE,
 } from './Constants';
 
 export const userLogin = (user) => async (dispatch) => {
@@ -16,7 +22,9 @@ export const userLogin = (user) => async (dispatch) => {
         });
 
         const { data } = await axios.post('/api/v1/user', user);
+
         console.log(data);
+
         localStorage.setItem('user', JSON.stringify(data.user));
 
         dispatch({
@@ -49,6 +57,52 @@ export const userUpdate = (user) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: USER_UPDATE_FAILED,
+            payload: error.response ? error.response : error.message,
+        });
+    }
+};
+
+export const friendRequest = (email) => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`/api/v1/user?search=${email}`);
+
+        dispatch({
+            type: FRIEND_REQUEST_SUCCESS,
+            payload: data.friendRequests,
+        });
+    } catch (error) {
+        dispatch({
+            type: FRIEND_REQUEST_ERROR,
+            payload: error.response ? error.response : error.message,
+        });
+    }
+};
+
+export const getFriends = (email) => async (dispatch) => {
+    try {
+        const { data } = await axios.get(`/api/v1/user?search=${email}`);
+        dispatch({
+            type: GET_FRIENDS_SUCCESS,
+            payload: data.friends,
+        });
+    } catch (error) {
+        dispatch({
+            type: GET_FRIENDS_ERROR,
+            payload: error.response ? error.response : error.message,
+        });
+    }
+};
+
+export const getChatMsg = () => async (dispatch) => {
+    try {
+        const { data } = await axios.get('/api/v1/messages');
+        dispatch({
+            type: GET_CHAT_MESSAGE,
+            payload: data.messages,
+        });
+    } catch (error) {
+        dispatch({
+            type: GET_CHAT_MESSAGE_ERROR,
             payload: error.response ? error.response : error.message,
         });
     }

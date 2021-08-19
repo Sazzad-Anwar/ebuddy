@@ -2,10 +2,13 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
-import { loginReducer } from './Reducers';
+import { friendRequestsReducer, getChatReducer, getFriendsReducer, loginReducer } from './Reducers';
 
 const reducer = combineReducers({
     userLogin: loginReducer,
+    friends: getFriendsReducer,
+    friendRequests: friendRequestsReducer,
+    chat: getChatReducer,
 });
 
 const getUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {};

@@ -71,8 +71,9 @@ const HomeScreen = () => {
     const handlePhotoUploaded = async () => {
         try {
             if (email && !photoUploaded) {
-                const { data } = await axios.get(`/api/v1/user?email=${email}`);
+                const { data } = await axios.get(`/api/v1/user?search=${email}`);
                 if (data.isSuccess) {
+                    console.log(data.user.photo);
                     setImages([data.user.photo]);
                 }
             } else if (!email) {

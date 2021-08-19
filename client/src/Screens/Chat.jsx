@@ -1,3 +1,7 @@
+/* eslint-disable no-shadow */
+/* eslint-disable jsx-a11y/media-has-caption */
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable consistent-return */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-plusplus */
@@ -7,7 +11,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
     Button,
-    CloseButton,
     Col,
     Container,
     Form,
@@ -16,22 +19,22 @@ import {
     Modal,
     Nav,
     Navbar,
-    NavDropdown,
     Row,
 } from 'react-bootstrap';
 import SearchIcon from '@material-ui/icons/Search';
-import { Link, NavLink, useHistory, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import {
     Avatar,
     Card,
-    Badge,
     IconButton,
-    CardMedia,
-    Input,
     MenuItem,
     ListItemIcon,
     Divider,
     Menu,
+    Tabs,
+    Tab,
+    Paper,
+    Badge,
 } from '@material-ui/core';
 import moment from 'moment';
 import { io } from 'socket.io-client';
@@ -49,33 +52,58 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 import Settings from '@material-ui/icons/Settings';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
-import { userLogout, userUpdate } from '../Redux/Actons';
+import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled';
+import ForumIcon from '@material-ui/icons/Forum';
+import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
+import NotificationsOffIcon from '@material-ui/icons/NotificationsOff';
+import path from 'path';
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import {
+    friendRequest,
+    getChatMsg,
+    getFriends,
+    userLogin,
+    userLogout,
+    userUpdate,
+} from '../Redux/Actons';
 import Messages from '../Components/Messages';
 import Users from '../Components/Users';
 import UploadPreview from '../Components/UploadPreview';
+import useDebounce from '../Hooks/useDebounce';
 
 const Chat = () => {
     const { user } = useSelector((state) => state.userLogin);
+    const { friends } = useSelector((state) => state.friends);
+    const { friendRequest: requests } = useSelector((state) => state.friendRequests);
+    const { chat } = useSelector((state) => state.chat);
     const dispatch = useDispatch();
     const history = useHistory();
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState(friends && friends);
     const { addToast } = useToasts();
+    const [tabValue, setTabValue] = useState(0);
+    const [notificationOn, setNotificationOn] = useState(true);
     const [roomUser, setRoomUser] = useState({});
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(chat && chat);
     const [message, setMessage] = useState('');
     const [search, setSearch] = useState('');
     const [images, setImages] = useState([]);
+    const [friendRequests, setFriendRequests] = useState([]);
+    const [newMessages, setNewMessages] = useState([]);
     const [show, setShow] = useState(false);
+    const [findFriends, setFindFriends] = useState();
     const [roomUserPicShow, setRoomUserPicShow] = useState(false);
-    const [replyMsgDetails, setReplyMsgDetails] = useState({});
+    const [replyMsgDetails, setReplyMsgDetails] = useState(null);
     const [editMsgId, setEditMsgId] = useState('');
     const [showMobileChat, setShowMobileChat] = useState(false);
     const [displayMessages, setDisplayMessages] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const [userFound, setUserFound] = useState(true);
+    const debouncedSearchTerm = useDebounce(search, 1000);
     const heightRef = useRef(0);
     const footerRef = useRef(0);
     const chatTextHeightRef = useRef(0);
     const textAreaRef = useRef(null);
-    const audio = new Audio('/msg_sound.mp3');
+
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -85,27 +113,44 @@ const Chat = () => {
         setAnchorEl(null);
     };
 
-    // const socket = io('/');
     const socket = useRef(null);
+
+    const searchCharacters = async (searchItem) => {
+        try {
+            const { data } = await axios.get(`/api/v1/user?search=${searchItem}`);
+            return data;
+        } catch (error) {
+            console.log(error.response);
+        }
+    };
+
+    const handleChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
 
     useEffect(() => {
         socket.current = io('/');
         socket.current.on('user-joined', (userData) => {
             const othersData = userData.allUsers.filter(
-                (userInfo) => userInfo.email !== user.email
+                (userInfo) =>
+                    userInfo.email !== user.email &&
+                    friends &&
+                    friends?.find((friend) => friend.email === userInfo.email)
             );
             setUsers(othersData);
             if (
                 userData.joinedUser &&
                 userData.joinedUser.email !== user.email &&
-                user?.isLoggedIn
+                user?.isLoggedIn &&
+                friends &&
+                friends?.find((friend) => friend.email === userData.email)
             ) {
                 addToast(`${userData.joinedUser.name} is active`, {
                     appearance: 'info',
                     autoDismiss: true,
                 });
 
-                if (roomUser !== null && roomUser.email === userData.joinedUser.email) {
+                if (roomUser !== null && roomUser?.email === userData.joinedUser.email) {
                     setRoomUser(userData.joinedUser);
                 }
             } else if (
@@ -113,14 +158,50 @@ const Chat = () => {
                 userData.leavingUser.email !== user.email &&
                 user?.isLoggedIn
             ) {
-                setRoomUser(userData.leavingUser);
+                setRoomUser();
             }
         });
 
-        socket.current.on('chat-message', (chat) => {
-            audio.play();
-            setMessages((prevMsg) => [...prevMsg, chat]);
+        socket.current.emit('user-login', user);
+
+        socket.current.on(
+            'friend-request',
+            ({ requestReceiver, requestSender, message: errorMsg, requestSenderUser }) => {
+                if (requestReceiver !== requestSender) {
+                    dispatch(friendRequest(user.email));
+                }
+            }
+        );
+
+        socket.current.on('friend-list', ({ requestId, userId }) => {
+            if (userId === user._id) {
+                dispatch(getFriends(user.email));
+                dispatch(friendRequest(user.email));
+            }
         });
+
+        return () => {
+            socket.current.off('user-joined', (data) => {});
+            socket.current.off('room-user-details', (userData) => {});
+
+            socket.current.off('friend-request', () => {});
+            socket.current.off('friend-list', () => {});
+            window.removeEventListener('resize', () => {});
+        };
+    }, [
+        addToast,
+        user,
+        history,
+        replyMsgDetails,
+        notificationOn,
+        roomUser,
+        friendRequests,
+        dispatch,
+        friends,
+    ]);
+
+    useEffect(() => {
+        const audio = new Audio('/msg_sound.mp3');
 
         socket.current.on('removeMsgFromChat', async (data) => {
             try {
@@ -131,16 +212,45 @@ const Chat = () => {
             }
         });
 
-        socket.current.emit('user-login', user);
+        socket.current.on('chat-message', async (chat) => {
+            if (chat.from !== user.email) {
+                audio.play();
+            }
+            if (chat.from === user.email || chat.to === user.email) {
+                dispatch(getChatMsg());
+            }
+        });
 
-        try {
-            const getMessage = async () => {
-                const { data } = await axios.get('/api/v1/messages');
-                setMessages(data.messages);
+        return () => {
+            socket.current.off('chat-message', (chat) => {});
+            socket.current.off('removeMsgFromChat', (data) => {});
+        };
+    }, [dispatch, messages, user.email]);
+
+    console.log(chat);
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            setIsSearching(true);
+            setUserFound(true);
+            const getResult = async () => {
+                try {
+                    const result = await searchCharacters(debouncedSearchTerm);
+                    if (result.isSuccess) {
+                        setFindFriends(result.user);
+                        setIsSearching(false);
+                    } else {
+                        setIsSearching(false);
+                        setUserFound(false);
+                    }
+                } catch (error) {
+                    console.log(error.response);
+                }
             };
-            getMessage();
-        } catch (error) {
-            console.log(error);
+            getResult();
+        } else {
+            setIsSearching(false);
+            setFindFriends('');
         }
 
         if (!user && !user?.isLoggedIn) {
@@ -159,15 +269,10 @@ const Chat = () => {
 
         replyMsgDetails !== null && replyMsgDetails.message ? textAreaRef.current.focus() : null;
 
-        return () => {
-            socket.current.off('user-joined', (data) => {});
-            socket.current.off('room-user-details', (userData) => {});
-            socket.current.off('chat-message', (chat) => {});
-            socket.current.off('removeMsgFromChat', (data) => {});
-            window.removeEventListener('resize', () => {});
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [addToast, user, search, replyMsgDetails]);
+        dispatch(friendRequest(user.email));
+        dispatch(getFriends(user.email));
+        dispatch(getChatMsg());
+    }, [debouncedSearchTerm, dispatch, history, replyMsgDetails, user]);
 
     const findRoomUser = (email) => {
         setRoomUser(users.filter((userInfo) => userInfo.email === email)[0]);
@@ -180,21 +285,28 @@ const Chat = () => {
             user: user._id,
             from: user.email,
             file: images,
-            repliedOf: replyMsgDetails.message ?? '',
-            to: roomUser.email,
+            repliedOf: replyMsgDetails?.message
+                ? replyMsgDetails?.message
+                : replyMsgDetails?.file
+                ? replyMsgDetails?.file[0]
+                : '',
+            to: roomUser?.email,
             message,
             sendAt: Date.now(),
         };
-        if ((message && e.key === 'Enter') || message) {
+        if ((message && e.key === 'Enter') || message || images) {
             setMessage('');
             try {
                 const { data } = await axios.post('/api/v1/messages', chat);
-                setMessages([...messages, data.message]);
-                socket.current.emit('message', data.message);
-                setShow(false);
-                setImages([]);
-                setReplyMsgDetails({});
-                setEditMsgId('');
+                if (data.message) {
+                    dispatch(getChatMsg());
+                    // setMessages([...messages, data.message]);
+                    socket.current.emit('message', data.message);
+                    setShow(false);
+                    setImages([]);
+                    setReplyMsgDetails({});
+                    setEditMsgId('');
+                }
             } catch (error) {
                 console.log(error);
             }
@@ -257,6 +369,23 @@ const Chat = () => {
         setReplyMsgDetails(messages.filter((findMsg) => findMsg._id === id)[0]);
     };
 
+    const addFriend = async (id) => {
+        socket.current.emit('friend-request-send', { friendId: id, myId: user._id });
+    };
+
+    const removeRequest = async (id) => {
+        socket.current.emit('friend-request-declined', { requestId: id, userId: user._id });
+        if (friendRequests) {
+            setFriendRequests(friendRequests.filter((request) => request._id !== id));
+        }
+        dispatch(friendRequest(user.email));
+    };
+
+    const requestAccepted = async (id) => {
+        socket.current.emit('friend-request-accepted', { requestId: id, userId: user._id });
+        console.log('clicked');
+    };
+
     return (
         <div>
             <Navbar bg="dark" className="nav__bar" ref={heightRef} expand="lg">
@@ -273,6 +402,25 @@ const Chat = () => {
                         </Navbar.Brand>
                     </Link>
                     <Nav className="ms-auto align-items-center">
+                        <Nav.Link className="text-white fs-5">
+                            {notificationOn ? (
+                                <IconButton
+                                    onClick={() => setNotificationOn(false)}
+                                    size="small"
+                                    sx={{ ml: 2 }}
+                                >
+                                    <NotificationsActiveIcon className="text-white" />
+                                </IconButton>
+                            ) : (
+                                <IconButton
+                                    onClick={() => setNotificationOn(true)}
+                                    size="small"
+                                    sx={{ ml: 2 }}
+                                >
+                                    <NotificationsOffIcon className="text-white" />
+                                </IconButton>
+                            )}
+                        </Nav.Link>
                         <Nav.Link className="text-white fs-5">
                             <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
                                 <Avatar
@@ -323,9 +471,9 @@ const Chat = () => {
                         >
                             <MenuItem>
                                 <Avatar
-                                    src={user.photo}
                                     alt={user.name}
-                                    style={{ width: 32, height: 32, marginRight: 28 }}
+                                    src={user.photo}
+                                    style={{ width: 22, height: 22, marginRight: 30 }}
                                 />{' '}
                                 {user.name}
                             </MenuItem>
@@ -367,6 +515,31 @@ const Chat = () => {
                                 backgroundColor: '#1c2834',
                             }}
                         >
+                            <Paper square style={{ marginTop: 15, borderRadius: 7 }}>
+                                <Tabs
+                                    value={tabValue}
+                                    onChange={handleChange}
+                                    variant="fullWidth"
+                                    indicatorColor="primary"
+                                    textColor="primary"
+                                    aria-label="icon tabs example"
+                                >
+                                    <Tab icon={<ForumIcon />} aria-label="phone" />
+
+                                    <Tab
+                                        icon={
+                                            <Badge
+                                                badgeContent={requests && requests.length}
+                                                color="primary"
+                                            >
+                                                <PersonAdd />
+                                            </Badge>
+                                        }
+                                        aria-label="favorite"
+                                    />
+                                </Tabs>
+                            </Paper>
+
                             <div className="search__bar">
                                 <InputGroup className="py-3">
                                     <InputGroup.Text id="search" className="bg-white border-end-0">
@@ -383,7 +556,130 @@ const Chat = () => {
                                     />
                                 </InputGroup>
                             </div>
+                            {search && isSearching && <p className="text-white">Searching...</p>}
+
+                            {findFriends ? (
+                                <Card
+                                    elevation={10}
+                                    body
+                                    className="bg-dark p-2 d-flex justify-content-between align-items-center mb-3"
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <div className="d-flex align-items-center">
+                                        <Avatar
+                                            alt={findFriends.name}
+                                            src={findFriends.photo}
+                                            className="shadow-lg border"
+                                        />
+
+                                        <div className="ps-3 ">
+                                            <p className="text-white my-0 fs-6 user__name_list">
+                                                {findFriends.name}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <IconButton onClick={() => addFriend(findFriends._id)}>
+                                            <PersonAdd className="text-white" />
+                                        </IconButton>
+                                    </div>
+                                </Card>
+                            ) : !isSearching && search && !userFound ? (
+                                <p className="text-white">User is not found</p>
+                            ) : null}
+
+                            {tabValue === 1 && (
+                                <div>
+                                    {requests &&
+                                        requests.map((request) => (
+                                            <Card
+                                                elevation={10}
+                                                body
+                                                className="bg-dark p-2 d-flex justify-content-between align-items-center mb-3"
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <div className="d-flex">
+                                                    <Avatar
+                                                        alt="Friend"
+                                                        src={request?.photo}
+                                                        className="shadow-lg border"
+                                                    />
+
+                                                    <div className="ps-3 ">
+                                                        <p className="text-white my-0 fs-6 user__name_list">
+                                                            {request?.name}
+                                                        </p>
+                                                        <p className="text-white my-0 last__seen">
+                                                            Wants to be your friend
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <IconButton
+                                                        onClick={() =>
+                                                            requestAccepted(request?._id)
+                                                        }
+                                                    >
+                                                        <PersonAdd className="text-white" />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        onClick={() => removeRequest(request?._id)}
+                                                    >
+                                                        <PersonAddDisabledIcon className="text-white" />
+                                                    </IconButton>
+                                                </div>
+                                            </Card>
+                                        ))}
+                                    {friendRequests &&
+                                        friendRequests.map((requestData) => (
+                                            <Card
+                                                elevation={10}
+                                                body
+                                                className="bg-dark p-2 d-flex justify-content-between align-items-center mb-3"
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <div className="d-flex">
+                                                    <Avatar
+                                                        alt="Friend"
+                                                        src={requestData?.photo}
+                                                        className="shadow-lg border"
+                                                    />
+
+                                                    <div className="ps-3 ">
+                                                        <p className="text-white my-0 fs-6 user__name_list">
+                                                            {requestData?.name}
+                                                        </p>
+                                                        <p className="text-white my-0 last__seen">
+                                                            Wants to be your friend
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <IconButton
+                                                        onClick={() =>
+                                                            requestAccepted(requestData?._id)
+                                                        }
+                                                    >
+                                                        <PersonAdd className="text-white" />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        onClick={() =>
+                                                            removeRequest(requestData?._id)
+                                                        }
+                                                    >
+                                                        <PersonAddDisabledIcon className="text-white" />
+                                                    </IconButton>
+                                                </div>
+                                            </Card>
+                                        ))}
+                                </div>
+                            )}
+
                             {users &&
+                                !tabValue &&
                                 users.map((userInfo) => (
                                     <Users
                                         userInfo={userInfo}
@@ -414,7 +710,7 @@ const Chat = () => {
                             }}
                         >
                             <main className="position-relative h-100">
-                                {roomUser.email ? (
+                                {roomUser?.email ? (
                                     <>
                                         <section
                                             className="message__header d-flex justify-content-between align-items-center py-4 px-2 border-bottom"
@@ -422,8 +718,8 @@ const Chat = () => {
                                         >
                                             <div className="d-flex">
                                                 <Avatar
-                                                    alt={roomUser.name}
-                                                    src={roomUser.photo}
+                                                    alt={roomUser?.name}
+                                                    src={roomUser?.photo}
                                                     style={{
                                                         height: 50,
                                                         width: 50,
@@ -433,13 +729,13 @@ const Chat = () => {
                                                 />
                                                 <div className="ps-3">
                                                     <h4 className="text-white my-0">
-                                                        {roomUser.name}
+                                                        {roomUser?.name}
                                                     </h4>
                                                     <p className="text-white my-0">
-                                                        {roomUser.isActive
+                                                        {roomUser?.isActive
                                                             ? 'Online'
                                                             : `Last Seen ${moment(
-                                                                  roomUser.updatedAt
+                                                                  roomUser?.updatedAt
                                                               ).calendar()}`}
                                                     </p>
                                                 </div>
@@ -451,9 +747,9 @@ const Chat = () => {
                                                 <ArrowRightAltIcon className="text-white" />
                                             </IconButton>
                                         </section>
-                                        <ScrollToBottom className="message__body overflow-auto position-relative">
-                                            {messages &&
-                                                messages.map((messageDetails) => (
+                                        <ScrollToBottom className="message__body overflow-auto position-relative drag__drop">
+                                            {chat &&
+                                                chat.map((messageDetails) => (
                                                     <Messages
                                                         messageDetails={messageDetails}
                                                         user={user}
@@ -462,7 +758,7 @@ const Chat = () => {
                                                         editMsg={editMsg}
                                                         deleteMsg={deleteMsg}
                                                         replyMsg={replyMsg}
-                                                        key={messageDetails.id}
+                                                        key={messageDetails._id}
                                                     />
                                                 ))}
                                         </ScrollToBottom>
@@ -470,10 +766,13 @@ const Chat = () => {
                                             className="input__area position-absolute bottom-0 start-0 end-0"
                                             id="text__area"
                                         >
-                                            <form onSubmit={sendMessage} className="mb-2">
+                                            <form
+                                                onSubmit={sendMessage}
+                                                className="mb-2 bg-primary pt-3"
+                                            >
                                                 <Row>
                                                     {replyMsgDetails !== null &&
-                                                        replyMsgDetails.message && (
+                                                        replyMsgDetails?.message && (
                                                             <Col xs={10}>
                                                                 <div className="px-3 py-2 bg-primary position-relative">
                                                                     <p className="mb-0 col-10 text-truncate text-white">
@@ -524,11 +823,12 @@ const Chat = () => {
                                                                 htmlFor="icon-button-file"
                                                                 className="float-end"
                                                             >
-                                                                <Input
+                                                                <input
                                                                     id="icon-button-file"
                                                                     type="file"
                                                                     onChange={uploadFile}
                                                                     hidden
+                                                                    multiple
                                                                 />
                                                                 <IconButton
                                                                     aria-label="upload picture"
@@ -638,7 +938,21 @@ const Chat = () => {
                 centered
                 className="shadow-lg w-100"
             >
-                <img alt={roomUser.name} src={roomUser.photo} />
+                {roomUser?.photo ? (
+                    <img alt={roomUser?.name} src={roomUser?.photo} height="auto" width="auto" />
+                ) : (
+                    <div className="d-flex flex-column justify-content-center align-items-center  my-5">
+                        <img
+                            alt="userphoto"
+                            src="/user.png"
+                            className="rounded-circle bg-dark p-3"
+                            height="150"
+                            width="150"
+                        />
+                        <h3 className="my-2">{roomUser?.name}</h3>
+                    </div>
+                )}
+
                 <IconButton
                     className="position-absolute top-0 end-0"
                     onClick={() => setRoomUserPicShow(!roomUserPicShow)}

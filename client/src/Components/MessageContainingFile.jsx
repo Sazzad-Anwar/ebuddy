@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/media-has-caption */
 import { Card, IconButton } from '@material-ui/core';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
@@ -8,7 +9,7 @@ import FileSaver from 'file-saver';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { host } from '../Config.json';
 
-const MessageContainingFile = ({ fileData, setShow, setChatImage }) => {
+const MessageContainingFile = ({ fileData, setShow, setChatImage, fileLength }) => {
     if (
         path.extname(fileData) === '.png' ||
         path.extname(fileData) === '.jpg' ||
@@ -16,7 +17,12 @@ const MessageContainingFile = ({ fileData, setShow, setChatImage }) => {
         path.extname(fileData) === '.gif'
     ) {
         return (
-            <Col xs={12} md={4} className="g-2" key={fileData}>
+            <Col
+                xs={12}
+                md={fileLength === 1 ? 12 : fileLength === 2 ? 6 : 4}
+                className="g-2"
+                key={fileData}
+            >
                 <Card
                     elevation={5}
                     className="mb-0 img__card"
@@ -30,7 +36,7 @@ const MessageContainingFile = ({ fileData, setShow, setChatImage }) => {
                     <img
                         src={fileData}
                         height={200}
-                        width={200}
+                        width="auto"
                         className="position-absolute"
                         alt={`upload-${fileData}`}
                         style={{
