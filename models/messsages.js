@@ -26,6 +26,7 @@ const messageSchema = mongoose.Schema({
     },
     isSeen: {
         type: Boolean,
+        default: false
     },
     emoji: {
         type: String,

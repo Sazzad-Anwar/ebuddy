@@ -116,21 +116,21 @@ const saveUser = asyncHandler(async (req, res) => {
 const message = asyncHandler(async (req, res) => {
     if (req.method === 'GET') {
 
-        let { messageType } = req.query;
+        let { messageSeen } = req.query;
 
-        if (messageType === 'seen') {
-            let message = await Message.find({ isSeen: true, });
+        if (messageSeen) {
+            await Message.updateOne({ from: messageSeen, isSeen: false }, {
+                $set: {
+                    isSeen: true
+                }
+            })
 
-            res.json({ message })
+            res.json({ message: "Updated" });
+        } else {
+            let messages = await Message.find();
+            res.json({ messages })
         }
-        if (messageType === 'unseen') {
-            let message = await Message.find({ isSeen: true });
 
-            res.json({ message })
-        }
-
-        let messages = await Message.find();
-        res.json({ messages });
     }
     if (req.method === 'POST') {
         let { user, from, file, to, message, repliedOf, _id } = req.body;

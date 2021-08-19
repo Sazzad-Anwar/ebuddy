@@ -41,14 +41,12 @@ import { io } from 'socket.io-client';
 import ScrollToBottom from 'react-scroll-to-bottom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
-import { v4 as uuidv4 } from 'uuid';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SendIcon from '@material-ui/icons/Send';
 import AttachmentIcon from '@material-ui/icons/Attachment';
 import CloseIcon from '@material-ui/icons/Close';
 import axios from 'axios';
 import CopyrightIcon from '@material-ui/icons/Copyright';
-import CancelIcon from '@material-ui/icons/Cancel';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 import Settings from '@material-ui/icons/Settings';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
@@ -56,8 +54,7 @@ import PersonAddDisabledIcon from '@material-ui/icons/PersonAddDisabled';
 import ForumIcon from '@material-ui/icons/Forum';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import NotificationsOffIcon from '@material-ui/icons/NotificationsOff';
-import path from 'path';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import FormatQuoteRoundedIcon from '@material-ui/icons/FormatQuoteRounded';
 import {
     friendRequest,
     getChatMsg,
@@ -213,7 +210,7 @@ const Chat = () => {
         });
 
         socket.current.on('chat-message', async (chat) => {
-            if (chat.from !== user.email) {
+            if (chat.from !== user.email && notificationOn) {
                 audio.play();
             }
             if (chat.from === user.email || chat.to === user.email) {
@@ -225,9 +222,7 @@ const Chat = () => {
             socket.current.off('chat-message', (chat) => {});
             socket.current.off('removeMsgFromChat', (data) => {});
         };
-    }, [dispatch, messages, user.email]);
-
-    console.log(chat);
+    }, [dispatch, messages, notificationOn, user.email]);
 
     useEffect(() => {
         if (debouncedSearchTerm) {
@@ -267,7 +262,9 @@ const Chat = () => {
             }
         });
 
-        replyMsgDetails !== null && replyMsgDetails.message ? textAreaRef.current.focus() : null;
+        replyMsgDetails !== null && (replyMsgDetails.message || replyMsgDetails.file)
+            ? textAreaRef.current.focus()
+            : null;
 
         dispatch(friendRequest(user.email));
         dispatch(getFriends(user.email));
@@ -361,12 +358,12 @@ const Chat = () => {
     };
     const editMsg = (id) => {
         setEditMsgId(id);
-        setMessages(messages.filter((findMsg) => findMsg._id !== id));
-        setMessage(messages.filter((findMsg) => findMsg._id === id)[0].message);
+        setMessage(chat && chat.filter((findMsg) => findMsg._id === id)[0].message);
+        dispatch(getChatMsg());
     };
 
     const replyMsg = (id) => {
-        setReplyMsgDetails(messages.filter((findMsg) => findMsg._id === id)[0]);
+        setReplyMsgDetails(chat && chat.filter((findMsg) => findMsg._id === id)[0]);
     };
 
     const addFriend = async (id) => {
@@ -547,7 +544,7 @@ const Chat = () => {
                                     </InputGroup.Text>
                                     <FormControl
                                         className="border-start-0"
-                                        placeholder="Username"
+                                        placeholder="Search friend ..."
                                         aria-label="Username"
                                         aria-describedby="search"
                                         value={search}
@@ -683,7 +680,7 @@ const Chat = () => {
                                 users.map((userInfo) => (
                                     <Users
                                         userInfo={userInfo}
-                                        messages={messages}
+                                        messages={chat && chat}
                                         findRoomUser={findRoomUser}
                                         key={userInfo.email}
                                         setReplyMsgDetails={setReplyMsgDetails}
@@ -776,17 +773,63 @@ const Chat = () => {
                                                             <Col xs={10}>
                                                                 <div className="px-3 py-2 bg-primary position-relative">
                                                                     <p className="mb-0 col-10 text-truncate text-white">
-                                                                        <b>Replying to : </b>
-                                                                        {
-                                                                            replyMsgDetails.message
-                                                                        }{' '}
+                                                                        <i>
+                                                                            <b>Replying to : </b>
+                                                                            <FormatQuoteRoundedIcon
+                                                                                style={{
+                                                                                    transform:
+                                                                                        'rotateY(180deg)',
+                                                                                    fontSize: 20,
+                                                                                }}
+                                                                            />
+                                                                            {
+                                                                                replyMsgDetails.message
+                                                                            }{' '}
+                                                                        </i>
+                                                                        <FormatQuoteRoundedIcon
+                                                                            style={{ fontSize: 20 }}
+                                                                        />
                                                                         <IconButton
                                                                             className="position-absolute top-0 end-0"
-                                                                            onClick={() =>
+                                                                            onClick={() => {
                                                                                 setReplyMsgDetails(
-                                                                                    ''
-                                                                                )
-                                                                            }
+                                                                                    {}
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <CloseIcon className="text-white bg-dark rounded-circle" />
+                                                                        </IconButton>
+                                                                    </p>
+                                                                </div>
+                                                            </Col>
+                                                        )}
+                                                    {replyMsgDetails !== null &&
+                                                        !replyMsgDetails?.message &&
+                                                        replyMsgDetails?.file && (
+                                                            <Col xs={10}>
+                                                                <div className="px-3 py-2 bg-primary position-relative">
+                                                                    <p className="mb-0 col-10 text-truncate text-white">
+                                                                        <i>
+                                                                            <b>Replying to : </b>
+                                                                            <FormatQuoteRoundedIcon
+                                                                                style={{
+                                                                                    transform:
+                                                                                        'rotateY(180deg)',
+                                                                                    fontSize: 20,
+                                                                                }}
+                                                                            />
+                                                                            Attachment
+                                                                        </i>
+                                                                        <FormatQuoteRoundedIcon
+                                                                            style={{ fontSize: 20 }}
+                                                                        />
+                                                                        <IconButton
+                                                                            className="position-absolute top-0 end-0"
+                                                                            onClick={() => {
+                                                                                setReplyMsgDetails(
+                                                                                    {}
+                                                                                );
+                                                                            }}
                                                                         >
                                                                             <CloseIcon className="text-white bg-dark rounded-circle" />
                                                                         </IconButton>

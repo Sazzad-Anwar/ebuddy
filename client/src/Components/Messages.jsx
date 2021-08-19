@@ -77,6 +77,20 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                                 </Card>
                             </div>
                         )}
+
+                        {messageDetails.file && (
+                            <Row className="ms-2">
+                                {messageDetails.file.map((fileData) => (
+                                    <MessageContainingFile
+                                        fileData={fileData}
+                                        setShow={setShow}
+                                        setChatImage={setChatImage}
+                                        key={fileData}
+                                    />
+                                ))}
+                            </Row>
+                        )}
+
                         <IconButton
                             aria-label="more"
                             aria-controls="long-menu"
@@ -109,19 +123,7 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                         </Menu>
                     </div>
 
-                    {messageDetails.file && (
-                        <Row className="ms-2">
-                            {messageDetails.file.map((fileData) => (
-                                <MessageContainingFile
-                                    fileData={fileData}
-                                    setShow={setShow}
-                                    setChatImage={setChatImage}
-                                    key={fileData}
-                                />
-                            ))}
-                        </Row>
-                    )}
-                    <p className="text-white ms-2 mt-1 last__seen">
+                    <p className="text-white ms-2 mt-0 pt-0 last__seen">
                         {moment(messageDetails.updatedAt).fromNow()}
                     </p>
                 </div>
@@ -241,7 +243,8 @@ const Messages = ({ messageDetails, user, roomUser, editMsg, deleteMsg, replyMsg
                         style={{ width: 32, height: 32, marginRight: 10 }}
                     />
                 </div>
-                <p className="text-white mt-1 me-3 pe-5 last__seen">
+                <p className="text-white mt-1 mb-0 me-3 pe-5 last__seen">
+                    {messageDetails.isSeen && <i className="me-1">seen</i>}
                     {moment(messageDetails.updatedAt).fromNow()}
                 </p>
 
