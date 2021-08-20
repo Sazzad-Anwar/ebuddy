@@ -53,11 +53,7 @@ const Users = ({
                     </p>
                 </div>
             </div>
-            {unreadMsg ? (
-                <Badge badgeContent={unreadMsg} color="primary">
-                    <ChatBubbleIcon className="ms-5 text-white" />
-                </Badge>
-            ) : null}
+            {unreadMsg ? <Badge badgeContent={unreadMsg} color="primary" className="me-3" /> : null}
         </Card>
     );
 };
