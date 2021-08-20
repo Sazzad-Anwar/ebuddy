@@ -25,6 +25,10 @@ const userSchema = mongoose.Schema({
     joinedAt: {
         type: Date,
         default: Date.now
+    },
+    password: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: true

@@ -1,5 +1,5 @@
 {
-    "name": "e-chat-buddy",
+    "name": "chat-buddy",
     "version": "1.0.1",
     "description": "Online Chatting, Voice calling & Video calling Application",
     "main": "app.js",

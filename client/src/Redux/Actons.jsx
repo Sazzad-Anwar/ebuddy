@@ -2,7 +2,6 @@
 import axios from 'axios';
 import {
     USER_LOGIN_FAILED,
-    USER_LOGIN_REQUEST,
     USER_LOGIN_SUCCESS,
     USER_LOGOUT,
     USER_UPDATE_FAILED,
@@ -17,13 +16,7 @@ import {
 
 export const userLogin = (user) => async (dispatch) => {
     try {
-        dispatch({
-            type: USER_LOGIN_REQUEST,
-        });
-
         const { data } = await axios.post('/api/v1/user', user);
-
-        console.log(data);
 
         localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -34,7 +27,10 @@ export const userLogin = (user) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: USER_LOGIN_FAILED,
-            payload: error.response ? error.response : error.message,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
         });
     }
 };
@@ -57,7 +53,10 @@ export const userUpdate = (user) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: USER_UPDATE_FAILED,
-            payload: error.response ? error.response : error.message,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
         });
     }
 };
@@ -73,7 +72,10 @@ export const friendRequest = (email) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: FRIEND_REQUEST_ERROR,
-            payload: error.response ? error.response : error.message,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
         });
     }
 };
@@ -88,7 +90,10 @@ export const getFriends = (email) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: GET_FRIENDS_ERROR,
-            payload: error.response ? error.response : error.message,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
         });
     }
 };
@@ -103,7 +108,10 @@ export const getChatMsg = () => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: GET_CHAT_MESSAGE_ERROR,
-            payload: error.response ? error.response : error.message,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
         });
     }
 };

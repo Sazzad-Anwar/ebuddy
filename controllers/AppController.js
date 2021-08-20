@@ -7,6 +7,7 @@ const Message = require('../models/messsages');
 const FriendRequests = require('../models/friendRequests');
 const Friends = require('../models/friends');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 const uploadFile = asyncHandler(async (req, res) => {
     let data = [];
@@ -33,7 +34,9 @@ const saveUser = asyncHandler(async (req, res) => {
 
     if (req.method === 'POST') {
 
-        const { name, email, photo, id } = req.body;
+        const { name, email, photo, id, password } = req.body;
+
+        let salt = await bcrypt.genSalt(10);
 
         if (id) {
 
@@ -44,24 +47,41 @@ const saveUser = asyncHandler(async (req, res) => {
 
             let userExist = await User.findOne({ email });
 
-            if (!userExist) {
+            if (!userExist && name && password) {
+
+                let hashPass = await bcrypt.hash(password, salt);
 
                 let newUser = new User({
-                    socketId: '', name, email, photo: photo ?? '', isLoggedIn: true
+                    socketId: '',
+                    name,
+                    email,
+                    photo: photo ?? '',
+                    isLoggedIn: true,
+                    password: hashPass
                 })
 
                 await newUser.save();
                 res.json({ user: newUser });
             }
-            else {
-                await User.updateOne({ email }, {
-                    $set: {
-                        name,
-                        photo: photo ?? userExist.photo
-                    }
-                })
+            else if (userExist && password) {
+
                 let user = await User.findOne({ email })
-                res.json({ user });
+
+                let isMatched = await bcrypt.compare(password, user.password);
+
+                let getUser = await User.findOne({ email }).populate('-password')
+
+                if (isMatched) {
+                    res.json({ user: getUser })
+                } else {
+                    res.status(404).json({
+                        message: 'Credentials do not matched'
+                    })
+                }
+            } else {
+                res.status(404).json({
+                    message: 'User is not registered'
+                })
             }
         }
     }

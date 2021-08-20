@@ -78,3 +78,12 @@
   error_occured: 'Fri, Aug 20, 2021, 01:08 AM',
   timestamp: '2021-08-19T19:08:25.482Z'
 }
+{
+  level: 'error',
+  message: 'isMatch is not defined',
+  IP: '::ffff:127.0.0.1',
+  stack: 'ReferenceError: isMatch is not defined\n' +
+    '    at D:\\PROJECTS\\eBuddy\\controllers\\AppController.js:72:29',
+  error_occured: 'Fri, Aug 20, 2021, 05:44 PM',
+  timestamp: '2021-08-20T11:44:26.158Z'
+}
